@@ -1,0 +1,613 @@
+/* Standard CSS Reset & Layout Shell */
+/* Tame the SVGs */
+svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.chatbot-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #f9fafb;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+    overflow: hidden;
+}
+
+.chatbot-main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+/* The Main Shell */
+.chatbot-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #f9fafb;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 280px;
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+/* Main Right Area */
+.chatbot-main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+/* Top Navigation */
+.top-nav {
+    height: 72px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+}
+
+/* Chat History Area */
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* Input Footer */
+.input-footer {
+    padding: 24px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* =========================================
+   SIDEBAR STYLES
+   ========================================= */
+
+.sidebar-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    background-color: #ef4444;
+    /* Red 500 */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.brand-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+}
+
+.new-chat-btn {
+    background-color: #ef4444;
+    color: white;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 8px;
+    width: 100%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.new-chat-btn:hover {
+    background-color: #dc2626;
+    /* Red 600 */
+}
+
+.plus-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.history-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-item {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #4b5563;
+    /* Gray 600 */
+}
+
+.history-item:hover {
+    background-color: #f9fafb;
+}
+
+/* Specific styling for the currently selected chat */
+.history-item.active {
+    background-color: #fef2f2;
+    /* Red 50 */
+    border-color: #fee2e2;
+    /* Red 100 */
+}
+
+.history-item.active .history-item-title {
+    color: #111827;
+    /* Gray 900 */
+    font-weight: 600;
+}
+
+.history-item.active svg {
+    color: #ef4444;
+}
+
+.history-item-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.history-item-title svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.history-item-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 4px;
+    padding-left: 24px;
+    /* Aligns with text, skipping the icon */
+}
+
+/* =========================================
+   TOP NAVIGATION STYLES
+   ========================================= */
+
+.nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    /* Gray 500 */
+    height: 100%;
+}
+
+.nav-link {
+    padding: 24px 0;
+    cursor: pointer;
+    transition: color 0.2s;
+    /* Add a transparent border to inactive links so the header doesn't jump when one becomes active */
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: #111827;
+    /* Gray 900 */
+}
+
+/* The styling for the currently selected page tab */
+.nav-link.active {
+    color: #ef4444;
+    /* Red 500 */
+    border-bottom-color: #ef4444;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.action-btn:hover {
+    color: #111827;
+}
+
+.action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.profile-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    /* Makes it a perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-left: 8px;
+}
+
+/* =========================================
+   CHAT AREA STYLES
+   ========================================= */
+
+/* Header Area */
+.chat-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.header-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.header-btn:hover {
+    background-color: #f9fafb;
+}
+
+.header-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Chat Bubbles */
+.message-wrapper {
+    display: flex;
+    gap: 16px;
+    max-width: 56rem;
+    /* max-w-4xl */
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar {
+    background-color: #ef4444;
+}
+
+.ai-avatar {
+    background-color: #1e293b;
+}
+
+.invoice-avatar-align {
+    margin-top: 4px;
+}
+
+.bubble-wrapper {
+    padding-top: 8px;
+}
+
+.ai-text {
+    color: #374151;
+    /* gray-700 */
+    margin: 0;
+    line-height: 1.5;
+}
+
+.user-bubble {
+    background-color: #1e293b;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 16px;
+    border-top-right-radius: 4px;
+    /* The little message tail effect */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.user-bubble p {
+    margin: 0;
+}
+
+/* AI Invoice Card */
+.invoice-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.invoice-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.invoice-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.invoice-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.invoice-value {
+    color: #111827;
+    font-weight: 500;
+}
+
+.invoice-value.large {
+    font-size: 1.25rem;
+}
+
+.invoice-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.invoice-btn {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.invoice-btn.primary {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.invoice-btn.primary:hover {
+    background-color: #dc2626;
+}
+
+.invoice-btn.secondary {
+    background-color: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.invoice-btn.secondary:hover {
+    background-color: #f9fafb;
+}
+
+/* Simple animation for new messages */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================
+   INPUT BAR STYLES
+   ========================================= */
+
+/* .input-footer is already defined in your structural CSS at the top! */
+
+.input-container {
+    max-width: 56rem;
+    /* Keeps it aligned with the chat bubbles above */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input-box {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+/* The red focus ring when typing */
+.input-box:focus-within {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px #ef4444;
+}
+
+.input-icon-btn {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.input-icon-btn:hover {
+    color: #4b5563;
+}
+
+.rotate-icon {
+    transform: rotate(-45deg);
+    /* Fixes the paperclip angle */
+}
+
+.chat-input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    padding: 0 12px;
+    color: #374151;
+    background: transparent;
+    font-size: 0.95rem;
+}
+
+.chat-input::placeholder {
+    color: #9ca3af;
+}
+
+.send-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    margin-left: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.send-btn:hover {
+    background-color: #dc2626;
+}
+
+.input-disclaimer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* Next steps for your team:
+  You will need to go into Sidebar.jsx, TopNav.jsx, ChatArea.jsx, and InputBar.jsx, 
+  delete the Tailwind classNames (e.g., className="w-72 bg-white border-r..."), 
+  replace them with standard names (e.g., className="sidebar"), 
+  and write the matching CSS rules here in this file!
+*/
