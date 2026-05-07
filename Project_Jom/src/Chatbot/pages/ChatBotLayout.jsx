@@ -1,35 +1,105 @@
-import { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import ChatArea from '../components/ChatArea';
-import InputBar from '../components/InputBar';
-import '../../Chatbot/chatbot.css'; 
+import { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import ChatArea from "../components/ChatArea";
+import InputBar from "../components/InputBar";
+import "../../Chatbot/chatbot.css";
 
 export default function ChatbotLayout() {
-    const [inputText, setInputText] = useState('');
-    const [messages, setMessages] = useState([
-        { role: 'ai', type: 'text', content: 'Good morning Mdm Siti. Based on your profile, I can help explain your MediShield Life premium and payment deadline.' },
-        { role: 'user', type: 'text', content: 'How much is my premium this year and when is it due?' },
-        { role: 'ai', type: 'invoice', content: '' }
-    ]);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const profile = JSON.parse(localStorage.getItem("profile") || "{}");
 
-    const handleSend = () => {
-        if (inputText.trim() === '') return;
-        setMessages([...messages, { role: 'user', type: 'text', content: inputText }]);
-        setInputText('');
+  const name = user?.name || profile?.identity?.name || "Demo Resident";
+
+  const userInitials = name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const createWelcomeMessage = () => [
+    {
+      role: "ai",
+      type: "text",
+      content: `Good morning ${name}. How can I help you today?`,
+    },
+  ];
+
+  const [inputText, setInputText] = useState("");
+  const [chatTitle, setChatTitle] = useState("New Chat");
+  const [messages, setMessages] = useState(createWelcomeMessage());
+  const [conversations, setConversations] = useState([]);
+
+  const handleSend = () => {
+    const trimmedInput = inputText.trim();
+    if (!trimmedInput) return;
+
+    const userMessage = {
+      role: "user",
+      type: "text",
+      content: trimmedInput,
     };
 
-    return (
-        <div className="chatbot-layout">
-            <Sidebar />
+    const updatedMessages = [...messages, userMessage];
 
-            <div className="chatbot-main-area">
-                <ChatArea messages={messages} />
-                <InputBar
-                    inputText={inputText}
-                    setInputText={setInputText}
-                    handleSend={handleSend}
-                />
-            </div>
-        </div>
-    );
+    if (chatTitle === "New Chat") {
+      const newConversation = {
+        id: Date.now(),
+        title: trimmedInput,
+        date: "Today",
+        messages: updatedMessages,
+      };
+
+      setChatTitle(trimmedInput);
+      setConversations((prev) => [newConversation, ...prev]);
+    } else {
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation.title === chatTitle
+            ? { ...conversation, messages: updatedMessages }
+            : conversation
+        )
+      );
+    }
+
+    setMessages(updatedMessages);
+    setInputText("");
+  };
+
+  const handleNewChat = () => {
+    setChatTitle("New Chat");
+    setMessages(createWelcomeMessage());
+    setInputText("");
+  };
+
+  const handleSelectConversation = (conversation) => {
+    setChatTitle(conversation.title);
+    setMessages(conversation.messages);
+  };
+
+  return (
+    <div className="chatbot-layout">
+      <Sidebar
+        conversations={conversations}
+        currentChatTitle={chatTitle}
+        onNewChat={handleNewChat}
+        onSelectConversation={handleSelectConversation}
+      />
+
+      <div className="chatbot-main-area">
+        <ChatArea
+          messages={messages}
+          chatTitle={chatTitle}
+          userInitials={userInitials}
+          aiInitials="AI"
+        />
+
+        <InputBar
+          inputText={inputText}
+          setInputText={setInputText}
+          handleSend={handleSend}
+        />
+      </div>
+    </div>
+  );
 }
