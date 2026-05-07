@@ -1,0 +1,280 @@
+/* =========================
+   MyTampines Auth Page
+   ========================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f7f8fa;
+  font-family: Inter, sans-serif;
+  color: #111827;
+}
+
+/* =========================
+   Layout
+   ========================= */
+
+.auth-layout {
+  min-height: 100vh;
+  background: #f7f8fa;
+}
+
+.auth-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px;
+}
+
+/* =========================
+   Header
+   ========================= */
+
+.header {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header-red-line {
+  width: 100%;
+  height: 4px;
+  background: #ef3340;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  padding: 22px 40px;
+}
+
+/* =========================
+   Logo
+   ========================= */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  background: #ef3340;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-chat-shape {
+  position: absolute;
+  width: 20px;
+  height: 16px;
+  background: white;
+  border-radius: 6px;
+  top: 10px;
+  left: 9px;
+}
+
+.logo-chat-shape::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  background: white;
+  transform: rotate(45deg);
+}
+
+.logo-pin {
+  color: #ef3340;
+  position: relative;
+  z-index: 2;
+}
+
+.logo-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2a44;
+  letter-spacing: -0.01em;
+}
+
+/* =========================
+   Auth Card
+   ========================= */
+
+.auth-card {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.04);
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-card-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.auth-card-header p {
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* =========================
+   Features
+   ========================= */
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-bottom: 32px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.feature-icon-circle {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 14px;
+  background: #fff1f2;
+  color: #ef3340;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.feature-description {
+  font-size: 0.95rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* =========================
+   Singpass Button
+   ========================= */
+
+.singpass-button {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  background: #ef3340;
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+}
+
+.singpass-button:hover {
+  background: #d92d3a;
+}
+
+.singpass-button:active {
+  transform: translateY(1px);
+}
+
+/* =========================
+   Terms
+   ========================= */
+
+.auth-terms {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.auth-terms a {
+  color: #ef3340;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-terms a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 18px 20px;
+  }
+
+  .logo-text {
+    font-size: 1rem;
+  }
+
+  .auth-main {
+    padding: 40px 16px;
+  }
+
+  .auth-card {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+
+  .auth-card-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .auth-card-header p {
+    font-size: 0.95rem;
+  }
+
+  .feature-item {
+    gap: 14px;
+  }
+
+  .feature-icon-circle {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+  }
+
+  .singpass-button {
+    padding: 16px;
+    font-size: 0.95rem;
+  }
+}
