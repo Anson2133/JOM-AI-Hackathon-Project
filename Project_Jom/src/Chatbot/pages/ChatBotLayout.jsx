@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import Sidebar from './Sidebar';
-import TopNav from './TopNav';
-import ChatArea from './ChatArea';
-import InputBar from './InputBar';
-import './chatbot.css'; // Import your normal CSS!
+import Sidebar from '../components/Sidebar';
+import ChatArea from '../components/ChatArea';
+import InputBar from '../components/InputBar';
+import '../../Chatbot/chatbot.css'; 
 
 export default function ChatbotLayout() {
     const [inputText, setInputText] = useState('');
@@ -24,7 +23,6 @@ export default function ChatbotLayout() {
             <Sidebar />
 
             <div className="chatbot-main-area">
-                <TopNav />
                 <ChatArea messages={messages} />
                 <InputBar
                     inputText={inputText}
