@@ -1,7 +1,7 @@
-import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import ChatArea from "../components/ChatArea";
 import InputBar from "../components/InputBar";
+import useChatbot from "../hooks/useChatbot";
 import "../../Chatbot/chatbot.css";
 
 export default function ChatbotLayout() {
@@ -17,71 +17,28 @@ export default function ChatbotLayout() {
     .slice(0, 2)
     .toUpperCase();
 
-  const createWelcomeMessage = () => [
-    {
-      role: "ai",
-      type: "text",
-      content: `Good morning ${name}. How can I help you today?`,
-    },
-  ];
+  const userId =
+    profile?.userId || user?.userId || user?.id || "demo-user-001";
 
-  const [inputText, setInputText] = useState("");
-  const [chatTitle, setChatTitle] = useState("New Chat");
-  const [messages, setMessages] = useState(createWelcomeMessage());
-  const [conversations, setConversations] = useState([]);
-
-  const handleSend = () => {
-    const trimmedInput = inputText.trim();
-    if (!trimmedInput) return;
-
-    const userMessage = {
-      role: "user",
-      type: "text",
-      content: trimmedInput,
-    };
-
-    const updatedMessages = [...messages, userMessage];
-
-    if (chatTitle === "New Chat") {
-      const newConversation = {
-        id: Date.now(),
-        title: trimmedInput,
-        date: "Today",
-        messages: updatedMessages,
-      };
-
-      setChatTitle(trimmedInput);
-      setConversations((prev) => [newConversation, ...prev]);
-    } else {
-      setConversations((prev) =>
-        prev.map((conversation) =>
-          conversation.title === chatTitle
-            ? { ...conversation, messages: updatedMessages }
-            : conversation
-        )
-      );
-    }
-
-    setMessages(updatedMessages);
-    setInputText("");
-  };
-
-  const handleNewChat = () => {
-    setChatTitle("New Chat");
-    setMessages(createWelcomeMessage());
-    setInputText("");
-  };
-
-  const handleSelectConversation = (conversation) => {
-    setChatTitle(conversation.title);
-    setMessages(conversation.messages);
-  };
+  const {
+    inputText,
+    setInputText,
+    chatTitle,
+    messages,
+    conversations,
+    currentConversationId,
+    isLoading,
+    handleSend,
+    handleNewChat,
+    handleSelectConversation,
+  } = useChatbot({ name, userId });
 
   return (
     <div className="chatbot-layout">
       <Sidebar
         conversations={conversations}
         currentChatTitle={chatTitle}
+        currentConversationId={currentConversationId}
         onNewChat={handleNewChat}
         onSelectConversation={handleSelectConversation}
       />
@@ -92,12 +49,14 @@ export default function ChatbotLayout() {
           chatTitle={chatTitle}
           userInitials={userInitials}
           aiInitials="AI"
+          isLoading={isLoading}
         />
 
         <InputBar
           inputText={inputText}
           setInputText={setInputText}
           handleSend={handleSend}
+          isLoading={isLoading}
         />
       </div>
     </div>
