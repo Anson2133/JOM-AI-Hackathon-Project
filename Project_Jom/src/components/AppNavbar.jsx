@@ -1,8 +1,20 @@
-import { MessageSquare, MapPin, Globe, Mic, LogOut } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  MessageSquare,
+  MapPin,
+  Globe,
+  Mic,
+  LogOut,
+  User,
+  ChevronDown,
+} from "lucide-react";
+import { NavLink, useNavigate } from "react-router";
+import "./AppNavbar.css";
 
 function AppNavbar() {
   const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const initials = user?.name
@@ -16,7 +28,7 @@ function AppNavbar() {
 
   const logout = () => {
     localStorage.clear();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -24,7 +36,7 @@ function AppNavbar() {
       <div className="navbar-red-line" />
 
       <div className="navbar-content">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={() => navigate("/chat")}>
           <div className="navbar-logo-icon">
             <MessageSquare size={24} />
             <MapPin size={14} className="navbar-pin" />
@@ -36,7 +48,6 @@ function AppNavbar() {
           <NavLink to="/chat">Chat</NavLink>
           <NavLink to="/services">Services</NavLink>
           <NavLink to="/history">History</NavLink>
-          <NavLink to="/profile">Profile</NavLink>
           <NavLink to="/help">Help</NavLink>
         </nav>
 
@@ -48,11 +59,43 @@ function AppNavbar() {
 
           <Mic size={22} className="navbar-icon" />
 
-          <div className="navbar-avatar">{initials}</div>
+          <div className="profile-menu-wrapper">
+            <button
+              className="profile-menu-button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <div className="navbar-avatar">{initials}</div>
+              <ChevronDown size={18} />
+            </button>
 
-          <button className="logout-button" onClick={logout}>
-            <LogOut size={24} />
-          </button>
+            {dropdownOpen && (
+              <div className="profile-dropdown">
+                <div className="profile-dropdown-header">
+                  <div className="dropdown-avatar">{initials}</div>
+                  <div>
+                    <strong>{user?.name || "Demo Resident"}</strong>
+                    <p>{user?.partialUinfin || "Active profile"}</p>
+                  </div>
+                </div>
+
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate("/profile");
+                  }}
+                >
+                  <User size={18} />
+                  View Profile
+                </button>
+
+                <button className="dropdown-item logout" onClick={logout}>
+                  <LogOut size={18} />
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

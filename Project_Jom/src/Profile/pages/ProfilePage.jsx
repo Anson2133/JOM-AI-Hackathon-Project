@@ -1,9 +1,8 @@
-import AppNavbar from "../components/AppNavbar";
 import ProfileHero from "../components/ProfileHero";
 import InfoCard from "../components/InfoCard";
 import ProfileSection from "../components/ProfileSection";
-import LikelyNeedsCard from "../components/LikelyNeedsCard";
-import "./profile.css";
+import LikelyNeedsCard from "../components/LikelyNeeds";
+import "../../Profile/profile.css";
 
 function ProfilePage() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -46,7 +45,6 @@ function ProfilePage() {
   if (!profile?.userId) {
     return (
       <div className="profile-page">
-        <AppNavbar />
         <main className="profile-empty">
           <h1>No profile found</h1>
           <p>Please log in as a demo resident first.</p>
@@ -57,8 +55,6 @@ function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <AppNavbar />
-
       <ProfileHero profile={profile} user={user} />
 
       <main className="profile-main">
