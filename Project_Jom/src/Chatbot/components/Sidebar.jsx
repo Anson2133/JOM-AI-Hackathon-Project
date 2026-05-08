@@ -1,21 +1,49 @@
 import { useMemo, useState } from "react";
 
+function getConversationTime(conversation) {
+  return (
+    conversation.updatedAt ||
+    conversation.date ||
+    conversation.createdAt ||
+    conversation.timestamp ||
+    ""
+  );
+}
+
 function formatConversationDate(dateString) {
   if (!dateString) return "New";
 
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "New";
 
-  if (Number.isNaN(date.getTime())) {
-    return dateString;
+  const now = new Date();
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const conversationDay = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+
+  if (conversationDay.getTime() === today.getTime()) {
+    return date.toLocaleTimeString("en-SG", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   }
 
-  return date.toLocaleString("en-SG", {
+  if (conversationDay.getTime() === yesterday.getTime()) {
+    return "Yesterday";
+  }
+
+  return date.toLocaleDateString("en-SG", {
     day: "numeric",
     month: "short",
     year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
   });
 }
 
@@ -29,19 +57,23 @@ export default function Sidebar({
   const [searchText, setSearchText] = useState("");
 
   const filteredConversations = useMemo(() => {
-    return conversations.filter((conversation) => {
-      const title = conversation.title || "";
-      const date = formatConversationDate(
-        conversation.date || conversation.updatedAt
-      );
+    const search = searchText.toLowerCase();
 
-      const search = searchText.toLowerCase();
+    return [...conversations]
+      .sort((a, b) => {
+        const dateA = new Date(getConversationTime(a)).getTime() || 0;
+        const dateB = new Date(getConversationTime(b)).getTime() || 0;
+        return dateB - dateA;
+      })
+      .filter((conversation) => {
+        const title = conversation.title || "New Chat";
+        const date = formatConversationDate(getConversationTime(conversation));
 
-      return (
-        title.toLowerCase().includes(search) ||
-        date.toLowerCase().includes(search)
-      );
-    });
+        return (
+          title.toLowerCase().includes(search) ||
+          date.toLowerCase().includes(search)
+        );
+      });
   }, [conversations, searchText]);
 
   return (
@@ -49,7 +81,7 @@ export default function Sidebar({
       <div className="sidebar-content">
         <button className="new-chat-btn" onClick={onNewChat}>
           <span className="plus-icon">+</span>
-          New Conversation
+          New Chat
         </button>
 
         <div className="history-section">
@@ -58,7 +90,7 @@ export default function Sidebar({
           <input
             className="history-search"
             type="text"
-            placeholder="Search conversations or date..."
+            placeholder="Search conversations..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
@@ -93,9 +125,7 @@ export default function Sidebar({
                     </span>
 
                     <span className="history-item-date">
-                      {formatConversationDate(
-                        conversation.date || conversation.updatedAt
-                      )}
+                      {formatConversationDate(getConversationTime(conversation))}
                     </span>
                   </button>
                 );

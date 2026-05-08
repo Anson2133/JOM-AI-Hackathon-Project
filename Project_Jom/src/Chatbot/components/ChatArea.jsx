@@ -62,7 +62,14 @@ export default function ChatArea({
   return (
     <>
       <div className="chat-header">
-        <h2 className="chat-title">{chatTitle}</h2>
+        <div>
+          <p className="chat-eyebrow">Current conversation</p>
+          <h2 className="chat-title">{chatTitle}</h2>
+        </div>
+
+        <div className="chat-header-pill">
+          Personalised resident support
+        </div>
       </div>
 
       <main className="chat-history">
