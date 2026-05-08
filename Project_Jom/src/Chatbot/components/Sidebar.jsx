@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function getConversationTime(conversation) {
   return (
@@ -55,6 +56,7 @@ export default function Sidebar({
   onSelectConversation,
 }) {
   const [searchText, setSearchText] = useState("");
+  const { t } = useTranslation();
 
   const filteredConversations = useMemo(() => {
     const search = searchText.toLowerCase();
@@ -66,7 +68,7 @@ export default function Sidebar({
         return dateB - dateA;
       })
       .filter((conversation) => {
-        const title = conversation.title || "New Chat";
+        const title = conversation.title || t("chat.newChat");
         const date = formatConversationDate(getConversationTime(conversation));
 
         return (
@@ -74,30 +76,34 @@ export default function Sidebar({
           date.toLowerCase().includes(search)
         );
       });
-  }, [conversations, searchText]);
+  }, [conversations, searchText, t]);
 
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
         <button className="new-chat-btn" onClick={onNewChat}>
           <span className="plus-icon">+</span>
-          New Chat
+          {t("chat.newChat")}
         </button>
 
         <div className="history-section">
-          <p className="history-title">Recent Conversations</p>
+          <p className="history-title">
+            {t("chat.recentConversations")}
+          </p>
 
           <input
             className="history-search"
             type="text"
-            placeholder="Search conversations..."
+            placeholder={t("chat.searchConversations")}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
 
           <div className="history-list">
             {filteredConversations.length === 0 ? (
-              <p className="empty-history">No conversations found</p>
+              <p className="empty-history">
+                {t("chat.noConversations")}
+              </p>
             ) : (
               filteredConversations.map((conversation) => {
                 const isActive =
@@ -120,7 +126,7 @@ export default function Sidebar({
                       </svg>
 
                       <span className="history-text">
-                        {conversation.title || "New Chat"}
+                        {conversation.title || t("chat.newChat")}
                       </span>
                     </span>
 

@@ -94,17 +94,19 @@ export default function useChatbot({ name, userId }) {
         }
     };
 
-    const handleSend = async () => {
+    const handleSend = async (attachment = null) => {
         const trimmedInput = inputText.trim();
 
-        if (!trimmedInput || isLoading) return;
+        if ((!trimmedInput && !attachment) || isLoading) return;
 
         const conversationId =
             currentConversationId || `chat-${Date.now()}`;
 
+        const titleSource = trimmedInput || attachment?.name || "Uploaded file";
+
         const newChatTitle =
             chatTitle === "New Chat"
-                ? await generateTitleWithAI(trimmedInput)
+                ? await generateTitleWithAI(titleSource)
                 : chatTitle;
 
         if (!currentConversationId) {
@@ -118,7 +120,13 @@ export default function useChatbot({ name, userId }) {
         const userMessage = {
             role: "user",
             type: "text",
-            content: trimmedInput,
+            content: trimmedInput || "Please analyse this uploaded file.",
+            attachment: attachment
+                ? {
+                    name: attachment.name,
+                    type: attachment.type,
+                }
+                : null,
         };
 
         const messagesWithUser = [...messages, userMessage];
@@ -145,7 +153,9 @@ export default function useChatbot({ name, userId }) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    message: trimmedInput,
+                    message: trimmedInput || "Please analyse this uploaded file.",
+                    file: attachment?.base64 || undefined,
+                    fileType: attachment?.type || undefined,
                 }),
             });
 
@@ -200,7 +210,7 @@ export default function useChatbot({ name, userId }) {
         } finally {
             setIsLoading(false);
         }
-    };
+    };;
 
     const handleNewChat = () => {
         const newConversation = {

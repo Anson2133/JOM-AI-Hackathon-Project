@@ -1,17 +1,27 @@
-import Header from "../components/Header";
-import AuthCard from "../components/AuthCard";
-import "../../Authentication/auth.css";
+// pages/LandingPage.jsx
+import React from 'react';
+import HeroSection from '../components/HeroSection';
+import ServicesSection from '../components/ServicesSection';
+import FeaturesSection from '../components/FeaturesSection';
+import HowItWorksSection from '../components/HowItWorksSection';
+import CTASection from '../components/CTASection';
+import Footer from '../components/Footer';
+import Header from '../../Authentication/components/Header';
+import "../../Authentication/auth.css"
+import "../../Authentication/landing.css";
 
-function LoginPage() {
-  return (
-    <div className="auth-layout">
-      <Header />
-
-      <main className="auth-main">
-        <AuthCard />
-      </main>
-    </div>
-  );
+export default function LoginPage() {
+    return (
+        <>
+            <Header />
+            <main>
+                <HeroSection />
+                <ServicesSection />
+                <FeaturesSection />
+                <HowItWorksSection />
+                <CTASection />
+            </main>
+            <Footer />
+        </>
+    );
 }
-
-export default LoginPage;

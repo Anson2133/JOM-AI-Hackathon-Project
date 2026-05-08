@@ -870,3 +870,169 @@ svg {
   border-color: #B81C1D;
   box-shadow: 0 0 0 1px #B81C1D;
 }
+
+.input-warning {
+  margin-bottom: 10px;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.attach-wrapper {
+  position: relative;
+}
+
+.attach-popup {
+  position: absolute;
+  bottom: 52px;
+  left: 0;
+  width: 260px;
+  background: #262626;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+}
+
+.attach-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.attach-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.attach-option-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #3b3b3b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attach-option p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.attach-option span {
+  font-size: 12px;
+  color: #c7c7c7;
+}
+
+.file-preview-card {
+  width: 380px;
+  max-width: 100%;
+  margin-bottom: 10px;
+  background: #2b2b2b;
+  color: white;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.file-preview-thumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-preview-info p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-info span {
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.file-preview-remove {
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.sent-file-card {
+  width: 320px;
+  max-width: 100%;
+  margin-bottom: 10px;
+  background: #2b2b2b;
+  color: white;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sent-file-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sent-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sent-file-info p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sent-file-info span {
+  font-size: 12px;
+  color: #d1d5db;
+}
