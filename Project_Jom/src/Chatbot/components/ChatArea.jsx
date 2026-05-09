@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 function cleanBotText(text) {
   if (!text) return "";
@@ -21,9 +22,7 @@ function formatMessageWithLinks(text) {
 
     const isUrl = part.match(urlRegex);
 
-    if (!isUrl) {
-      return part;
-    }
+    if (!isUrl) return part;
 
     const href =
       part.startsWith("http://") || part.startsWith("https://")
@@ -44,6 +43,25 @@ function formatMessageWithLinks(text) {
   });
 }
 
+function FileCard({ attachment }) {
+  if (!attachment) return null;
+
+  const isPdf = attachment.type === "application/pdf";
+
+  return (
+    <div className="sent-file-card">
+      <div className={`sent-file-icon ${isPdf ? "pdf-file" : "image-file"}`}>
+        {isPdf ? "PDF" : "IMG"}
+      </div>
+
+      <div className="sent-file-info">
+        <p>{attachment.name}</p>
+        <span>{attachment.type}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ChatArea({
   messages,
   chatTitle,
@@ -52,6 +70,7 @@ export default function ChatArea({
   isLoading,
 }) {
   const messagesEndRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -63,12 +82,12 @@ export default function ChatArea({
     <>
       <div className="chat-header">
         <div>
-          <p className="chat-eyebrow">Current conversation</p>
+          <p className="chat-eyebrow">{t("chat.currentConversation")}</p>
           <h2 className="chat-title">{chatTitle}</h2>
         </div>
 
         <div className="chat-header-pill">
-          Personalised resident support
+          {t("chat.personalisedSupport")}
         </div>
       </div>
 
@@ -79,8 +98,9 @@ export default function ChatArea({
           return (
             <div
               key={index}
-              className={`message-wrapper ${isUser ? "user-message" : "ai-message"
-                }`}
+              className={`message-wrapper ${
+                isUser ? "user-message" : "ai-message"
+              }`}
             >
               {!isUser && (
                 <div className="avatar ai-avatar">
@@ -89,12 +109,21 @@ export default function ChatArea({
               )}
 
               <div
-                className={`bubble ${isUser ? "user-bubble" : "ai-bubble"
-                  }`}
+                className={`bubble ${
+                  isUser ? "user-bubble" : "ai-bubble"
+                }`}
               >
-                <div className="message-text">
-                  {formatMessageWithLinks(cleanBotText(msg.content))}
-                </div>
+                {msg.attachment && (
+                  <FileCard attachment={msg.attachment} />
+                )}
+
+                {msg.content && (
+                  <div className="message-text">
+                    {isUser
+                      ? formatMessageWithLinks(msg.content)
+                      : formatMessageWithLinks(cleanBotText(msg.content))}
+                  </div>
+                )}
               </div>
 
               {isUser && (

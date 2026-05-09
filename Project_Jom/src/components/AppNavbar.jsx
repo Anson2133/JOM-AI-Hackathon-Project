@@ -9,11 +9,15 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import "./AppNavbar.css";
 
 function AppNavbar() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -25,6 +29,21 @@ function AppNavbar() {
         .slice(0, 2)
         .toUpperCase()
     : "U";
+
+  const currentLanguage = i18n.language?.split("-")[0] || "en";
+
+  const languageLabels = {
+    en: "EN",
+    ms: "MS",
+    zh: "中文",
+    ta: "தமிழ்",
+  };
+
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem("i18nextLng", lang);
+    setLanguageOpen(false);
+  };
 
   const logout = () => {
     localStorage.clear();
@@ -41,20 +60,36 @@ function AppNavbar() {
             <MessageSquare size={24} />
             <MapPin size={14} className="navbar-pin" />
           </div>
-          <span>MyTampines Assistant</span>
+          <span>{t("nav.appName")}</span>
         </div>
 
         <nav className="navbar-links">
-          <NavLink to="/chat">Chat</NavLink>
-          <NavLink to="/services">Services</NavLink>
-          <NavLink to="/history">History</NavLink>
-          <NavLink to="/help">Help</NavLink>
+          <NavLink to="/chat">{t("nav.chat")}</NavLink>
+          <NavLink to="/services">{t("nav.services")}</NavLink>
+          <NavLink to="/history">{t("nav.history")}</NavLink>
+          <NavLink to="/help">{t("nav.help")}</NavLink>
         </nav>
 
         <div className="navbar-actions">
-          <div className="language-pill">
-            <Globe size={20} />
-            <span>EN</span>
+          <div className="language-wrapper">
+            <button
+              className="language-pill"
+              type="button"
+              onClick={() => setLanguageOpen(!languageOpen)}
+            >
+              <Globe size={20} />
+              <span>{languageLabels[currentLanguage] || "EN"}</span>
+              <ChevronDown size={16} />
+            </button>
+
+            {languageOpen && (
+              <div className="language-dropdown">
+                <button onClick={() => changeLanguage("en")}>English</button>
+                <button onClick={() => changeLanguage("ms")}>Bahasa Melayu</button>
+                <button onClick={() => changeLanguage("zh")}>中文</button>
+                <button onClick={() => changeLanguage("ta")}>தமிழ்</button>
+              </div>
+            )}
           </div>
 
           <Mic size={22} className="navbar-icon" />
@@ -62,6 +97,7 @@ function AppNavbar() {
           <div className="profile-menu-wrapper">
             <button
               className="profile-menu-button"
+              type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <div className="navbar-avatar">{initials}</div>
@@ -80,18 +116,19 @@ function AppNavbar() {
 
                 <button
                   className="dropdown-item"
+                  type="button"
                   onClick={() => {
                     setDropdownOpen(false);
                     navigate("/profile");
                   }}
                 >
                   <User size={18} />
-                  View Profile
+                  {t("common.editProfile")}
                 </button>
 
-                <button className="dropdown-item logout" onClick={logout}>
+                <button className="dropdown-item logout" type="button" onClick={logout}>
                   <LogOut size={18} />
-                  Log out
+                  {t("common.logout")}
                 </button>
               </div>
             )}
