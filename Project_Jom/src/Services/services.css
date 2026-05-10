@@ -658,3 +658,152 @@
     font-size: 14px;
     font-weight: 600;
 }
+
+.ai-review-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.ai-review-box strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #344054;
+}
+
+.ai-review-box p {
+    margin: 0;
+    color: #475467;
+    font-size: 14px;
+}
+
+.ai-concerns-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.ai-concerns-box strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #9a3412;
+}
+
+.ai-concerns-box p {
+    margin: 4px 0;
+    color: #9a3412;
+    font-size: 14px;
+}
+
+.extra-question-hint {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.journey-primary-btn {
+    margin-top: 18px;
+}
+
+.journey-options-grid {
+    margin-bottom: 24px;
+}
+
+.extra-question-hint {
+    margin-bottom: 18px;
+}
+
+.continue-btn {
+    margin-top: 18px;
+}
+
+.ai-reason {
+    margin-bottom: 16px;
+}
+
+.recommended-service-card {
+    padding-bottom: 28px;
+}
+
+.journey-actions {
+    margin-top: 34px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.journey-secondary-btn,
+.journey-primary-btn {
+    min-height: 58px;
+    padding: 0 28px;
+    border-radius: 16px;
+}
+
+.journey-primary-btn {
+    min-width: 260px;
+}
+
+.journey-secondary-btn {
+    min-width: 100px;
+}
+
+.journey-primary-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.match-loading-box {
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 18px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.match-loading-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #101828;
+}
+
+.match-loading-top span {
+    font-weight: 700;
+}
+
+.match-loading-top strong {
+    color: #cf1322;
+}
+
+.match-progress-track {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.match-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: #cf1322;
+    transition: width 0.3s ease;
+}
+
+.match-loading-box p {
+    margin: 12px 0 0;
+    color: #667085;
+    font-size: 14px;
+}

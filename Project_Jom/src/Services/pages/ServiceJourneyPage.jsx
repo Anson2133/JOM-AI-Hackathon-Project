@@ -23,6 +23,7 @@ function ServiceJourneyPage() {
   const [eligibilityAnswers, setEligibilityAnswers] = useState({});
   const [eligibilityResult, setEligibilityResult] = useState(null);
   const [pdfEmail, setPdfEmail] = useState("");
+  const [matchProgress, setMatchProgress] = useState(0);
 
   const cachedProfile = JSON.parse(
     localStorage.getItem("cachedProfile") || "{}"
@@ -93,6 +94,18 @@ function ServiceJourneyPage() {
         ? "Ready to recheck eligibility"
         : "Needs more information";
 
+  const startMatchProgress = () => {
+    setMatchProgress(10);
+
+    const interval = setInterval(() => {
+      setMatchProgress((prev) => {
+        if (prev >= 90) return prev;
+        return prev + 10;
+      });
+    }, 350);
+
+    return interval;
+  };
   return (
     <div className="service-journey-page">
       <ServiceStepper currentStep={currentStep} />
@@ -172,18 +185,50 @@ function ServiceJourneyPage() {
 
             <button
               className="journey-primary-btn"
+              disabled={matchingLoading}
               onClick={async () => {
-                await matchServices({
+                const progressInterval = startMatchProgress();
+
+                const result = await matchServices({
                   categoryId,
                   selectedNeedId: selectedNeed?.id,
                 });
 
-                setCurrentStep(3);
+                clearInterval(progressInterval);
+                setMatchProgress(100);
+
+                setTimeout(() => {
+                  setMatchProgress(0);
+
+                  if (result) {
+                    setCurrentStep(3);
+                  }
+                }, 400);
               }}
             >
-              Find Recommended Services
+              {matchingLoading ? "Finding Services..." : "Find Recommended Services"}
             </button>
           </div>
+
+          {matchingLoading && (
+            <div className="match-loading-box">
+              <div className="match-loading-top">
+                <span>Finding recommended services...</span>
+                <strong>{matchProgress}%</strong>
+              </div>
+
+              <div className="match-progress-track">
+                <div
+                  className="match-progress-fill"
+                  style={{ width: `${matchProgress}%` }}
+                />
+              </div>
+
+              <p>
+                Checking your profile, selected need, service eligibility rules, and AI review.
+              </p>
+            </div>
+          )}
         </section>
       )}
 

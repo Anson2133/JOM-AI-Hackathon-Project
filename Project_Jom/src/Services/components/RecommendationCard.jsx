@@ -29,8 +29,32 @@ function RecommendationCard({ service, onViewGuidance }) {
         </div>
       </div>
 
-      {service.aiReason && (
-        <p className="ai-reason">{service.aiReason}</p>
+      {service.aiReason && <p className="ai-reason">{service.aiReason}</p>}
+
+      {(service.aiEligibilityView || service.aiConfidence) && (
+        <div className="ai-review-box">
+          <strong>AI Review</strong>
+          <p>
+            {service.aiEligibilityView || "Needs Confirmation"}
+            {service.aiConfidence ? ` · ${service.aiConfidence} confidence` : ""}
+          </p>
+        </div>
+      )}
+
+      {(service.aiConcerns || []).length > 0 && (
+        <div className="ai-concerns-box">
+          <strong>Things to note</strong>
+          {service.aiConcerns.map((concern, index) => (
+            <p key={index}>• {concern}</p>
+          ))}
+        </div>
+      )}
+
+      {(service.extraQuestions || []).length > 0 && (
+        <p className="extra-question-hint">
+          This service has {service.extraQuestions.length} follow-up question
+          {service.extraQuestions.length > 1 ? "s" : ""} before applying.
+        </p>
       )}
 
       <button className="continue-btn" onClick={onViewGuidance}>
