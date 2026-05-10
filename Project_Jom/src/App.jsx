@@ -4,6 +4,7 @@ import SelectProfilePage from "./Authentication/pages/SelectProfile";
 import ProfilePage from "./Profile/pages/ProfilePage";
 import AppLayout from "./layouts/AppLayout";
 import ChatbotLayout from './Chatbot/pages/ChatBotLayout';
+import HelpPage from './Help/pages/HelpPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/chat" element={<ChatbotLayout />} />
+        <Route path="/help" element={<HelpPage />} />
       </Route>
     </Routes>
   );
