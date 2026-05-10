@@ -1,46 +1,65 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import ProfileHero from "../components/ProfileHero";
 import InfoCard from "../components/InfoCard";
 import ProfileSection from "../components/ProfileSection";
-import LikelyNeedsCard from "../components/LikelyNeeds";
 import "../../Profile/profile.css";
 
+const PROFILE_API_URL =
+  "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/profile";
+
 function ProfilePage() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const profile = JSON.parse(localStorage.getItem("profile") || "{}");
+  const navigate = useNavigate();
 
-  const address = profile?.housing?.registeredAddress;
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const fullAddress = address
-    ? `${address.block} ${address.street}, #${address.floor}-${address.unit}, Singapore ${address.postal}`
-    : "-";
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
 
-  const identityRows = [
-    { label: "Name", value: profile?.identity?.name },
-    { label: "Partial NRIC/FIN", value: profile?.identity?.partialUinfin },
-    { label: "Date of Birth", value: profile?.identity?.dateOfBirth },
-    { label: "Sex", value: profile?.identity?.sex },
-    { label: "Race", value: profile?.identity?.race },
-    { label: "Nationality", value: profile?.identity?.nationality },
-    { label: "Residential Status", value: profile?.identity?.residentialStatus },
-    { label: "Marital Status", value: profile?.identity?.maritalStatus },
-  ];
+        if (!userId) {
+          setLoading(false);
+          return;
+        }
 
-  const contactRows = [
-    { label: "Email", value: profile?.contact?.email },
-    { label: "Mobile", value: profile?.contact?.mobile },
-  ];
+        const res = await fetch(`${PROFILE_API_URL}/${userId}`);
+        const data = await res.json();
 
-  const housingRows = [
-    { label: "Housing Type", value: profile?.housing?.housingType },
-    { label: "Registered Address", value: fullAddress },
-  ];
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to fetch profile");
+        }
 
-  const contextRows = [
-    { label: "Age Group", value: profile?.derivedContext?.ageGroup },
-    { label: "Life Stage", value: profile?.derivedContext?.lifeStage },
-  ];
+        setUser(data.user);
+        setProfile(data.profile);
+        localStorage.setItem(
+          "cachedProfile",
+          JSON.stringify({
+            displayName: data.user.displayName,
+            ...data.profile,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const likelyNeeds = profile?.derivedContext?.likelyNeeds || [];
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <main className="profile-empty">
+          <h1>Loading profile...</h1>
+        </main>
+      </div>
+    );
+  }
 
   if (!profile?.userId) {
     return (
@@ -53,46 +72,58 @@ function ProfilePage() {
     );
   }
 
+  const serviceRows = [
+    { label: "Age", value: profile.age },
+    { label: "Residential Status", value: profile.residentialStatus },
+    { label: "Housing Type", value: profile.housingType },
+    { label: "Household Type", value: profile.householdType },
+  ];
+
+  const householdRows = [
+    { label: "Employment Status", value: profile.employmentStatus },
+    { label: "Income Band", value: profile.incomeBand },
+    { label: "Marital Status", value: profile.maritalStatus },
+  ];
+
+  const supportRows = [
+    { label: "Has Children", value: profile.hasChildren ? "Yes" : "No" },
+    { label: "Caregiver", value: profile.caregiver ? "Yes" : "No" },
+    { label: "Mobility Needs", value: profile.mobilityNeeds ? "Yes" : "No" },
+  ];
+
   return (
     <div className="profile-page">
-      <ProfileHero profile={profile} user={user} />
+      <ProfileHero user={user} profile={profile} />
 
       <main className="profile-main">
         <div className="profile-column">
-          <InfoCard title="Official Information" rows={identityRows} />
-          <InfoCard title="Housing Information" rows={housingRows} />
-          <InfoCard title="Contact Information" rows={contactRows} />
+          <InfoCard title="Service Matching Profile" rows={serviceRows} />
+          <InfoCard title="Household Information" rows={householdRows} />
+          <InfoCard title="Support Needs" rows={supportRows} />
         </div>
 
         <div className="profile-column">
-          <InfoCard title="Derived Resident Context" rows={contextRows} />
-          <LikelyNeedsCard needs={likelyNeeds} />
-
-          <ProfileSection title="Chatbot Context">
-            <p className="chatbot-context-text">
-              {profile?.derivedContext?.chatbotContext}
+          <ProfileSection title="Service Recommendations">
+            <p className="profile-muted-text">
+              Recommendations will appear here after you explore available
+              services and complete a service journey.
             </p>
+
+            <button
+              className="profile-action-btn"
+              onClick={() => navigate("/services")}
+            >
+              Explore Services
+            </button>
           </ProfileSection>
 
-          {profile?.derivedContext?.relatedResident && (
-            <InfoCard
-              title="Related Resident"
-              rows={[
-                {
-                  label: "Name",
-                  value: profile.derivedContext.relatedResident.name,
-                },
-                {
-                  label: "Relationship",
-                  value: profile.derivedContext.relatedResident.relationship,
-                },
-                {
-                  label: "Partial NRIC/FIN",
-                  value: profile.derivedContext.relatedResident.partialUinfin,
-                },
-              ]}
-            />
-          )}
+          <ProfileSection title="Privacy Note">
+            <p className="profile-muted-text">
+              This profile only stores general service-matching information such
+              as age, housing type, income band, and support needs. It does not
+              store NRIC, exact income, address, email, or phone number.
+            </p>
+          </ProfileSection>
         </div>
       </main>
     </div>

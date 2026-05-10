@@ -19,15 +19,15 @@ function AppNavbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const profile = JSON.parse(localStorage.getItem("cachedProfile") || "{}");
 
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+  const initials = profile?.displayName
+    ? profile.displayName
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "U";
 
   const currentLanguage = i18n.language?.split("-")[0] || "en";
@@ -109,8 +109,8 @@ function AppNavbar() {
                 <div className="profile-dropdown-header">
                   <div className="dropdown-avatar">{initials}</div>
                   <div>
-                    <strong>{user?.name || "Demo Resident"}</strong>
-                    <p>{user?.partialUinfin || "Active profile"}</p>
+                    <strong>{profile?.displayName || "Demo Resident"}</strong>
+                    <p>{profile?.partialUinfin || "Active profile"}</p>
                   </div>
                 </div>
 
@@ -128,7 +128,7 @@ function AppNavbar() {
 
                 <button className="dropdown-item logout" type="button" onClick={logout}>
                   <LogOut size={18} />
-                  {t("common.logout")}
+                  {t("logout")}
                 </button>
               </div>
             )}

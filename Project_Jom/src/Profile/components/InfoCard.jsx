@@ -1,9 +1,9 @@
-function InfoCard({ title, rows }) {
+function InfoCard({ title, rows = [] }) {
   return (
-    <section className="profile-card-box">
+    <section className="info-card">
       <h2>{title}</h2>
 
-      <div className="info-row-list">
+      <div className="info-card-rows">
         {rows.map((row) => (
           <div className="info-row" key={row.label}>
             <span>{row.label}</span>

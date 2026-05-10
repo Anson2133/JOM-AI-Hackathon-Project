@@ -4,6 +4,8 @@ import SelectProfilePage from "./Authentication/pages/SelectProfile";
 import ProfilePage from "./Profile/pages/ProfilePage";
 import AppLayout from "./layouts/AppLayout";
 import ChatbotLayout from './Chatbot/pages/ChatBotLayout';
+import ServicesPage from "./Services/pages/ServicesPage";
+import ServiceJourneyPage from "./Services/pages/ServiceJourneyPage";
 
 function App() {
   return (
@@ -16,6 +18,11 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/chat" element={<ChatbotLayout />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route
+          path="/services/:categoryId"
+          element={<ServiceJourneyPage />}
+        />
       </Route>
     </Routes>
   );
