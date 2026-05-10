@@ -1036,3 +1036,26 @@ svg {
   font-size: 12px;
   color: #d1d5db;
 }
+
+.chat-service-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chat-service-button {
+  border: none;
+  background: #d32f2f;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.chat-service-button:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
+}

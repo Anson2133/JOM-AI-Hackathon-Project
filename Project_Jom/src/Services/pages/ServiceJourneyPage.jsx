@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router";
 
 import ServiceStepper from "../components/ServiceJourneyStepper";
 import ServiceCard from "../components/RecommendationCard";
@@ -14,6 +14,10 @@ import "../services.css";
 
 function ServiceJourneyPage() {
   const { categoryId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const serviceIdFromChat = searchParams.get("serviceId");
+  const fromChat = searchParams.get("fromChat") === "true";
 
   const { services, loading } = useServices();
 
@@ -24,6 +28,19 @@ function ServiceJourneyPage() {
   const [eligibilityResult, setEligibilityResult] = useState(null);
   const [pdfEmail, setPdfEmail] = useState("");
   const [matchProgress, setMatchProgress] = useState(0);
+
+  useEffect(() => {
+    if (!fromChat || !serviceIdFromChat || loading || selectedService) return;
+
+    const exactService = services.find(
+      (service) => service.serviceId === serviceIdFromChat
+    );
+
+    if (!exactService) return;
+
+    setSelectedService(exactService);
+    setCurrentStep(5);
+  }, [fromChat, serviceIdFromChat, loading, services, selectedService]);
 
   const cachedProfile = JSON.parse(
     localStorage.getItem("cachedProfile") || "{}"
@@ -106,6 +123,7 @@ function ServiceJourneyPage() {
 
     return interval;
   };
+
   return (
     <div className="service-journey-page">
       <ServiceStepper currentStep={currentStep} />
@@ -422,6 +440,12 @@ function ServiceJourneyPage() {
         <section className="journey-card">
           <h1>Required Documents</h1>
 
+          {fromChat && (
+            <p className="journey-subtitle">
+              This service was opened from your chatbot recommendation.
+            </p>
+          )}
+
           <p className="journey-subtitle">{selectedService.serviceName}</p>
 
           <div className="guidance-list">
@@ -544,6 +568,7 @@ function ServiceJourneyPage() {
                     >
                       {sendingEmail ? "Sending..." : "Send Email"}
                     </button>
+
                     {emailSent && <p className="success-text">Email sent successfully.</p>}
                     {emailError && <p className="error-text">{emailError}</p>}
                   </div>

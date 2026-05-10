@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 function cleanBotText(text) {
   if (!text) return "";
@@ -71,6 +72,7 @@ export default function ChatArea({
 }) {
   const messagesEndRef = useRef(null);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -98,9 +100,8 @@ export default function ChatArea({
           return (
             <div
               key={index}
-              className={`message-wrapper ${
-                isUser ? "user-message" : "ai-message"
-              }`}
+              className={`message-wrapper ${isUser ? "user-message" : "ai-message"
+                }`}
             >
               {!isUser && (
                 <div className="avatar ai-avatar">
@@ -109,9 +110,8 @@ export default function ChatArea({
               )}
 
               <div
-                className={`bubble ${
-                  isUser ? "user-bubble" : "ai-bubble"
-                }`}
+                className={`bubble ${isUser ? "user-bubble" : "ai-bubble"
+                  }`}
               >
                 {msg.attachment && (
                   <FileCard attachment={msg.attachment} />
@@ -122,6 +122,26 @@ export default function ChatArea({
                     {isUser
                       ? formatMessageWithLinks(msg.content)
                       : formatMessageWithLinks(cleanBotText(msg.content))}
+                  </div>
+                )}
+
+                {!isUser && msg.relatedServices?.length > 0 && (
+                  <div className="chat-service-actions">
+                    {msg.relatedServices.map((service) => (
+                      <button
+                        key={service.serviceId || service.id || service.title}
+                        className="chat-service-button"
+                        onClick={() => {
+                          if (service.linkType === "external") {
+                            window.open(service.url, "_blank");
+                          } else {
+                            navigate(service.url);
+                          }
+                        }}
+                      >
+                        View {service.title}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>

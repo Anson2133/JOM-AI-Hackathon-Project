@@ -165,10 +165,14 @@ export default function useChatbot({ name, userId }) {
 
             const data = await response.json();
 
+            console.log("CHATBOT RESPONSE:", data);
+
             const aiMessage = {
                 role: "ai",
                 type: "text",
-                content: data?.response || "Sorry, I could not get a response.",
+                content:
+                    data?.response || "Sorry, I could not get a response.",
+                relatedServices: data?.relatedServices || [],
             };
 
             const finalMessages = [...messagesWithUser, aiMessage];
