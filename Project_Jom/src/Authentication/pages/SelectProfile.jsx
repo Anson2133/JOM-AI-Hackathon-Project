@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 import Header from "../components/Header";
 import ProfileCard from "../components/ProfileCard";
 import demoProfiles from "../data/demoProfiles";
-import "../selectprofile.css";
+import "../selectProfile.css";
 
 function SelectProfilePage() {
   const navigate = useNavigate();
