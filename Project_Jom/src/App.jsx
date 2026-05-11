@@ -25,8 +25,8 @@ function App() {
           element={<ServiceJourneyPage />}
         />
         <Route path="/document-scanner" element={<DocumentScannerPage />} />
-        <Route path="/mobile-document" element={<MobileDocumentUploadPage />} />
-        
+        <Route path="/mobile-document-upload/:scanSessionId" element={<MobileDocumentUploadPage />} />
+
       </Route>
 
     </Routes>
