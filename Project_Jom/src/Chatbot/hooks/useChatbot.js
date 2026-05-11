@@ -18,6 +18,33 @@ export default function useChatbot({ name, userId }) {
         },
     ];
 
+    const createDocumentContextMessage = (context) => {
+        const serviceName =
+            context?.relatedService?.serviceName ||
+            context?.mainTopic ||
+            "the scanned document";
+
+        const riskLevel = context?.scamRisk?.level || "Unknown";
+
+        return [
+            {
+                role: "ai",
+                type: "text",
+                content:
+                    `I see you scanned a document about ${serviceName}.\n\n` +
+                    `Summary: ${context?.summary || "No summary available."}\n\n` +
+                    `Scam risk: ${riskLevel}\n\n` +
+                    `Recommended next step: ${context?.recommendedNextStep || "Verify through official channels before proceeding."}\n\n` +
+                    `You can ask me things like:\n` +
+                    `1. Is this message safe?\n` +
+                    `2. What does this document mean?\n` +
+                    `3. How do I apply for this service?\n` +
+                    `4. What should I do next?`,
+                documentContext: context,
+            },
+        ];
+    };
+
     const [inputText, setInputText] = useState("");
     const [chatTitle, setChatTitle] = useState("New Chat");
     const [messages, setMessages] = useState(createWelcomeMessage());
@@ -41,6 +68,42 @@ export default function useChatbot({ name, userId }) {
 
         if (userId) {
             loadConversations();
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const rawContext = params.get("documentContext");
+
+        if (!rawContext) return;
+
+        try {
+            const context = JSON.parse(decodeURIComponent(rawContext));
+            const conversationId = `document-chat-${Date.now()}`;
+
+            const documentMessages = createDocumentContextMessage(context);
+
+            const newConversation = {
+                userId,
+                conversationId,
+                title: `Document: ${context.mainTopic || "Scanned Document"}`,
+                date: new Date().toISOString(),
+                messages: documentMessages,
+            };
+
+            setChatTitle(newConversation.title);
+            setMessages(documentMessages);
+            setCurrentConversationId(conversationId);
+            setInputText("");
+            setConversations((prev) => [newConversation, ...prev]);
+
+            if (userId) {
+                saveConversationToDB(newConversation);
+            }
+
+            window.history.replaceState({}, "", "/chat");
+        } catch (error) {
+            console.error("Failed to load document context:", error);
         }
     }, [userId]);
 
@@ -75,6 +138,7 @@ export default function useChatbot({ name, userId }) {
             return [conversation, ...prev];
         });
     };
+
     const generateTitleWithAI = async (message) => {
         try {
             const response = await fetch(TITLE_API_URL, {
@@ -146,6 +210,10 @@ export default function useChatbot({ name, userId }) {
         setInputText("");
         setIsLoading(true);
 
+        const latestDocumentContext = messages.find(
+            (message) => message.documentContext
+        )?.documentContext;
+
         try {
             const response = await fetch(CHATBOT_API_URL, {
                 method: "POST",
@@ -153,7 +221,17 @@ export default function useChatbot({ name, userId }) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    message: trimmedInput || "Please analyse this uploaded file.",
+                    message: latestDocumentContext
+                        ? `
+The user is asking about a scanned document.
+
+Document context:
+${JSON.stringify(latestDocumentContext, null, 2)}
+
+User question:
+${trimmedInput || "Please help me understand this document."}
+`
+                        : trimmedInput || "Please analyse this uploaded file.",
                     file: attachment?.base64 || undefined,
                     fileType: attachment?.type || undefined,
                 }),
@@ -164,8 +242,6 @@ export default function useChatbot({ name, userId }) {
             }
 
             const data = await response.json();
-
-            console.log("CHATBOT RESPONSE:", data);
 
             const aiMessage = {
                 role: "ai",
@@ -214,7 +290,7 @@ export default function useChatbot({ name, userId }) {
         } finally {
             setIsLoading(false);
         }
-    };;
+    };
 
     const handleNewChat = () => {
         const newConversation = {

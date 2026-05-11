@@ -49,10 +49,58 @@ function ServicesPage() {
           </p>
         </div>
 
-        <button>
+        <button onClick={() => navigate("/chat")}>
           Start Chat
         </button>
       </section>
+      <div className="document-scanner-cta">
+        <div className="document-scanner-cta-content">
+          <div className="document-scanner-pill">
+            New AI Feature
+          </div>
+
+          <h2>Document Scanner</h2>
+
+          <p>
+            Upload government letters, PDFs, screenshots, SMS messages,
+            or notices to understand what they mean, check scam risk,
+            and connect to the right service guidance flow.
+          </p>
+
+          <div className="document-scanner-tags">
+            <span>AI Summary</span>
+            <span>Scam Detection</span>
+            <span>Service Matching</span>
+            <span>Textract + Bedrock</span>
+          </div>
+
+          <button
+            className="document-scanner-btn"
+            onClick={() => navigate("/document-scanner")}
+          >
+            Open Document Scanner
+          </button>
+        </div>
+
+        <div className="document-scanner-visual">
+          <div className="scanner-preview-window">
+            <div className="scanner-red-line" />
+
+            <div className="scanner-preview-document">
+              <div className="scanner-preview-header" />
+
+              <div className="scanner-preview-line short" />
+              <div className="scanner-preview-line" />
+              <div className="scanner-preview-line" />
+              <div className="scanner-preview-line medium" />
+
+              <div className="scanner-preview-alert">
+                Scam Risk Analysis Complete
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

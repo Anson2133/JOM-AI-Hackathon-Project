@@ -6,7 +6,7 @@ import AppLayout from "./layouts/AppLayout";
 import ChatbotLayout from './Chatbot/pages/ChatBotLayout';
 import ServicesPage from "./Services/pages/ServicesPage";
 import ServiceJourneyPage from "./Services/pages/ServiceJourneyPage";
-
+import DocumentScannerPage from "./Document Scanner/pages/DocumentScannerPage";
 function App() {
   return (
     <Routes>
@@ -23,7 +23,9 @@ function App() {
           path="/services/:categoryId"
           element={<ServiceJourneyPage />}
         />
+        <Route path="/document-scanner" element={<DocumentScannerPage />} />
       </Route>
+
     </Routes>
   );
 }
