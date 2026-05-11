@@ -1057,5 +1057,5 @@ svg {
 
 .chat-service-button:hover {
   background: #b71c1c;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }

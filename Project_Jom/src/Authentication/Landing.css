@@ -820,5 +820,5 @@ img { display: block; max-width: 100%; }
 }
 
 @media (max-width: 640px) {
-  .hero__cta { flex-direction: column; align-items: flex-end; }
+  .hero__cta { flex-direction: column; align-items: flex-start; }
 }
