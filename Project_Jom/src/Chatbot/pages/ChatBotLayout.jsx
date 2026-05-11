@@ -2,7 +2,7 @@ import Sidebar from "../components/Sidebar";
 import ChatArea from "../components/ChatArea";
 import InputBar from "../components/InputBar";
 import useChatbot from "../hooks/useChatbot";
-import "../../Chatbot/chatbot.css";
+import "../chatbot.css";
 
 export default function ChatbotLayout() {
   const cachedProfile = JSON.parse(

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useParams } from "react-router";
 import { Camera, ImageUp, RotateCcw, CheckCircle } from "lucide-react";
+import "../documentScanner.css";
 
 const API_BASE_URL =
     "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com";

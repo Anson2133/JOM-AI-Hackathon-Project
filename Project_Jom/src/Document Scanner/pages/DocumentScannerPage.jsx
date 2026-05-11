@@ -13,7 +13,7 @@ import QrScanModal from "../components/QrScanModal";
 import useDocumentScanner from "../hooks/useDocumentScanner";
 import useQrUploadSession from "../hooks/useQrUploadSession";
 
-import "../../Document Scanner/documentScanner.css";
+import "../documentScanner.css";
 
 export default function DocumentScannerPage() {
     const {

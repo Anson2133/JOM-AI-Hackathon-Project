@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import ProfileHero from "../components/ProfileHero";
 import InfoCard from "../components/InfoCard";
 import ProfileSection from "../components/ProfileSection";
-import "../../Profile/profile.css";
+import "../profile.css";
 
 const PROFILE_API_URL =
   "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/profile";
