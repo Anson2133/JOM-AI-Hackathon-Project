@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import './help.css';
 
 export default function HelpPage() {
+    // States to track which accordion is open
     const [openIndex, setOpenIndex] = useState(null);
+    const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
-    // The enriched dataset with actionable information
+    // 1. The Full Services Dataset
     const helpCategories = [
         {
             title: "Financial Support",
@@ -49,6 +51,48 @@ export default function HelpPage() {
             ]
         },
         {
+            title: "Community Booking",
+            services: [
+                {
+                    name: "ActiveSG Facility Booking",
+                    source: "ActiveSG",
+                    description: "Book sports facilities such as badminton courts, swimming pools, and gyms at Our Tampines Hub and other locations.",
+                    eligibility: ["All ActiveSG members (Singaporeans, PRs, and valid pass holders)"],
+                    steps: ["Log in to the ActiveSG App or website via Singpass", "Select your desired facility and timeslot", "Make payment via ActiveSG Wallet or credit card"],
+                    contact: "Hotline: 1800-344-1177"
+                },
+                {
+                    name: "Community Club (CC) Courses & Facilities",
+                    source: "onePA",
+                    description: "Register for community courses (e.g., cooking, martial arts) and book CC facilities like multi-purpose halls.",
+                    eligibility: ["Open to the general public"],
+                    steps: ["Visit the onePA portal", "Search for 'Tampines' in the location filter", "Select your course/facility and checkout securely"],
+                    contact: "Contact your local Tampines CC directly via the portal"
+                }
+            ]
+        },
+        {
+            title: "Community Services",
+            services: [
+                {
+                    name: "Bulky Item Removal",
+                    source: "Tampines Town Council",
+                    description: "Free bulky item removal service for HDB residents (up to 3 items per month).",
+                    eligibility: ["Residents living in HDB flats managed by Tampines Town Council"],
+                    steps: ["Call the Town Council or use the OneService App", "Book an appointment at least 3 working days in advance", "Place items outside your flat only on the day of collection"],
+                    contact: "Hotline: 6781 2222 (Tampines Town Council)"
+                },
+                {
+                    name: "Dengue & Pest Control",
+                    source: "National Environment Agency (NEA)",
+                    description: "Report mosquito breeding grounds or pest infestations in public municipal areas.",
+                    eligibility: ["All residents"],
+                    steps: ["Download the OneService App", "Select 'Submit Case' and choose 'Pests'", "Pinpoint the exact location and attach photos"],
+                    contact: "NEA Hotline: 1800-225-5632"
+                }
+            ]
+        },
+        {
             title: "Employment & Skills",
             services: [
                 {
@@ -58,6 +102,27 @@ export default function HelpPage() {
                     eligibility: ["Singapore Citizens aged 25 and above"],
                     steps: ["Log in to the MySkillsFuture portal via Singpass", "Search for an eligible course in the directory", "Submit a claim before the course start date"],
                     contact: "Hotline: 6785 5785"
+                }
+            ]
+        },
+        {
+            title: "Education Support",
+            services: [
+                {
+                    name: "Child Care Subsidies",
+                    source: "Early Childhood Development Agency (ECDA)",
+                    description: "Basic and Additional Subsidies to help defray the cost of infant and child care fees.",
+                    eligibility: ["Singapore Citizen child", "Enrolled in an ECDA-licensed centre"],
+                    steps: ["Obtain the subsidy application form from your child's preschool", "Submit the completed form along with income documents to the centre", "The centre will process the application with ECDA"],
+                    contact: "Email: contact@ecda.gov.sg"
+                },
+                {
+                    name: "MOE Financial Assistance Scheme (FAS)",
+                    source: "Ministry of Education (MOE)",
+                    description: "Financial aid for school fees, textbooks, and uniforms for students from lower-income families.",
+                    eligibility: ["Singapore Citizen attending a government or government-aided school", "Meets gross monthly household income limits"],
+                    steps: ["Download the MOE FAS application form online", "Submit the form and supporting documents directly to the student's school"],
+                    contact: "Contact the respective school's general office"
                 }
             ]
         },
@@ -73,21 +138,60 @@ export default function HelpPage() {
                     contact: "AIC Hotline: 1800-650-6060"
                 }
             ]
+        },
+        {
+            title: "Accessibility & Inclusion",
+            services: [
+                {
+                    name: "Assistive Technology Fund (ATF)",
+                    source: "SG Enable",
+                    description: "Subsidies for persons with disabilities to purchase assistive technology devices (e.g., wheelchairs, hearing aids).",
+                    eligibility: ["Singapore Citizen or PR", "Certified to have a permanent disability"],
+                    steps: ["Consult a therapist or medical social worker at a restructured hospital/polyclinic", "They will assess your need and submit the ATF application on your behalf"],
+                    contact: "SG Enable Infoline: 1800-8585-885"
+                }
+            ]
         }
-        // Note for your team: You can easily copy/paste this structure to fill in the remaining categories!
     ];
 
+    // 2. The FAQ Dataset
+    const faqData = [
+        {
+            question: "How do I pay my Town Council Service & Conservancy Charges (S&CC)?",
+            answer: "You can pay your S&CC via AXS stations, SAM kiosks, internet banking, or by setting up a GIRO arrangement. For digital payments, you can also use the AXS m-Station app."
+        },
+        {
+            question: "Can I walk into Tampines Polyclinic without an appointment?",
+            answer: "While walk-ins are accepted for urgent conditions, it is highly recommended to book an appointment via the HealthHub app to avoid waiting times that can exceed 2-3 hours."
+        },
+        {
+            question: "What should I do if my CDC voucher link is not working?",
+            answer: "If your link has expired or isn't loading, you can visit go.gov.sg/cdcv and log in with your Singpass to retrieve your active voucher link again. Ensure you are not connected to a VPN."
+        },
+        {
+            question: "How do I report a faulty street lamp or illegal parking?",
+            answer: "The fastest way to report municipal issues is through the OneService App. Select 'Submit Case', choose the relevant category, and pin the location. The app routes it directly to the correct agency (e.g., LTA or Town Council)."
+        }
+    ];
+
+    // 3. Toggle Functions
     const toggleAccordion = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
 
+    const toggleFaqAccordion = (index) => {
+        setOpenFaqIndex(openFaqIndex === index ? null : index);
+    };
+
+    // 4. Page Rendering
     return (
         <div className="help-page-container">
             <header className="help-header">
                 <h1>Help & Resources</h1>
-                <p>Detailed guides, eligibility criteria, and contact information for local services.</p>
+                <p>Detailed guides, eligibility criteria, and contact information for local municipal services.</p>
             </header>
 
+            {/* SERVICES SECTION */}
             <div className="accordion-container">
                 {helpCategories.map((category, index) => {
                     const isOpen = openIndex === index;
@@ -148,6 +252,37 @@ export default function HelpPage() {
                     );
                 })}
             </div>
+
+            {/* FAQ SECTION */}
+            <div className="faq-section">
+                <h2 className="faq-header-title">Frequently Asked Questions</h2>
+                <div className="accordion-container">
+                    {faqData.map((faq, index) => {
+                        const isOpen = openFaqIndex === index;
+
+                        return (
+                            <div key={`faq-${index}`} className={`accordion-item ${isOpen ? 'open' : ''}`}>
+                                <button
+                                    className="accordion-header"
+                                    onClick={() => toggleFaqAccordion(index)}
+                                >
+                                    <h3 className="faq-question">{faq.question}</h3>
+                                    <span className="accordion-icon">
+                                        {isOpen ? '−' : '+'}
+                                    </span>
+                                </button>
+
+                                {isOpen && (
+                                    <div className="accordion-content faq-answer-box">
+                                        <p>{faq.answer}</p>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
         </div>
     );
 }

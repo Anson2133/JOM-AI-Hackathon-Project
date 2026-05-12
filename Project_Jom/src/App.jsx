@@ -4,7 +4,7 @@ import SelectProfilePage from "./Authentication/pages/SelectProfile";
 import ProfilePage from "./Profile/pages/ProfilePage";
 import AppLayout from "./layouts/AppLayout";
 import ChatbotLayout from './Chatbot/pages/ChatBotLayout';
-import HelpPage from './Help/pages/HelpPage';
+import HelpPage from "./HelpPage/HelpPage";
 
 function App() {
   return (

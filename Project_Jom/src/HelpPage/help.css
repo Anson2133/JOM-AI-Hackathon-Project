@@ -178,3 +178,30 @@
         transform: translateY(0);
     }
 }
+
+/* --- FAQ Section Styles --- */
+.faq-section {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 2px dashed #e5e7eb;
+}
+
+.faq-header-title {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 24px;
+}
+
+.faq-question {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #111827;
+    margin: 0;
+}
+
+.faq-answer-box p {
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
