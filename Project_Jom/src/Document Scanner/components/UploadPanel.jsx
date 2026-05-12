@@ -1,4 +1,4 @@
-import { Camera, FileUp, QrCode, RotateCcw } from "lucide-react";
+import { FileUp, QrCode, RotateCcw } from "lucide-react";
 
 export default function UploadPanel({
     file,
@@ -50,19 +50,6 @@ export default function UploadPanel({
                     <span>Open camera on phone</span>
                 </button>
 
-                <label className="scanner-upload-action">
-                    <Camera size={24} />
-                    <strong>Take Photo</strong>
-                    <span>Use camera</span>
-
-                    <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={handleInputChange}
-                        hidden
-                    />
-                </label>
             </div>
 
             <label className="scanner-dropzone">
