@@ -514,7 +514,7 @@ svg {
 }
 
 .message-text {
-  white-space: pre-wrap;
+  white-space: normal;
   margin: 0;
 }
 
@@ -844,7 +844,7 @@ svg {
 }
 
 .message-text {
-  white-space: pre-wrap;
+  white-space: normal;
   margin: 0;
 }
 
@@ -1035,4 +1035,45 @@ svg {
 .sent-file-info span {
   font-size: 12px;
   color: #d1d5db;
+}
+
+.listening {
+  color: #B81C1D !important;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.speak-btn-wrapper {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.speak-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.speak-btn:hover {
+  color: #B81C1D;
+  border-color: #B81C1D;
+}
+
+.speak-btn.speaking {
+  color: #B81C1D;
+  border-color: #B81C1D;
+  animation: pulse 1s infinite;
 }

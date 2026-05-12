@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const CHATBOT_API_URL =
     "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/chat";
@@ -10,11 +11,20 @@ const TITLE_API_URL =
     "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/chat-title";
 
 export default function useChatbot({ name, userId }) {
+    const { i18n } = useTranslation();
+
+    const welcomeMessages = {
+        en: `Good morning ${name}. How can I help you today?`,
+        ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
+        zh: `早上好 ${name}。今天我能为您做什么？`,
+        ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`
+    };
+
     const createWelcomeMessage = () => [
         {
             role: "ai",
             type: "text",
-            content: `Good morning ${name}. How can I help you today?`,
+            content: welcomeMessages[i18n.language] || welcomeMessages.en,
         },
     ];
 
@@ -43,6 +53,28 @@ export default function useChatbot({ name, userId }) {
             loadConversations();
         }
     }, [userId]);
+
+    useEffect(() => {
+        const welcomeMessages = {
+            en: `Good morning ${name}. How can I help you today?`,
+            ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
+            zh: `早上好 ${name}。今天我能为您做什么？`,
+            ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`
+        };
+
+        setMessages((prev) => {
+            if (prev.length === 0 || prev[0].role !== "ai") return prev;
+
+            return [
+                {
+                    role: "ai",
+                    type: "text",
+                    content: welcomeMessages[i18n.language] || welcomeMessages.en,
+                },
+                ...prev.slice(1),
+            ];
+        });
+    }, [i18n.language, name]);
 
     const saveConversationToDB = async (conversation) => {
         try {
@@ -75,6 +107,7 @@ export default function useChatbot({ name, userId }) {
             return [conversation, ...prev];
         });
     };
+
     const generateTitleWithAI = async (message) => {
         try {
             const response = await fetch(TITLE_API_URL, {
@@ -156,6 +189,7 @@ export default function useChatbot({ name, userId }) {
                     message: trimmedInput || "Please analyse this uploaded file.",
                     file: attachment?.base64 || undefined,
                     fileType: attachment?.type || undefined,
+                    language: i18n.language,
                 }),
             });
 
@@ -210,7 +244,7 @@ export default function useChatbot({ name, userId }) {
         } finally {
             setIsLoading(false);
         }
-    };;
+    };
 
     const handleNewChat = () => {
         const newConversation = {
