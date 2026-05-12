@@ -12,8 +12,9 @@ export default function InputBar({
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [warning, setWarning] = useState("");
+    const [isListening, setIsListening] = useState(false);
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const supportedTypes = [
         "application/pdf",
@@ -86,6 +87,39 @@ export default function InputBar({
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
+    };
+
+    const handleVoice = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("Voice input not supported in this browser.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+
+        const langMap = {
+            en: "en-SG",
+            ms: "ms-MY",
+            zh: "zh-CN",
+            ta: "ta-IN"
+        };
+
+        recognition.lang = langMap[i18n.language] || "en-SG";
+        recognition.interimResults = false;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInputText(transcript);
+        };
+
+        recognition.onerror = () => setIsListening(false);
+
+        recognition.start();
     };
 
     return (
@@ -180,7 +214,11 @@ export default function InputBar({
                         }}
                     />
 
-                    <button className="input-icon-btn" type="button">
+                    <button
+                        className={`input-icon-btn ${isListening ? "listening" : ""}`}
+                        type="button"
+                        onClick={handleVoice}
+                    >
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 strokeLinecap="round"

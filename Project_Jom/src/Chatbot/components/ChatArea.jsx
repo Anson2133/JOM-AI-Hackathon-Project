@@ -1,12 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function cleanBotText(text) {
   if (!text) return "";
-
   return text
-    .replace(/([.!?])\s+(?=[A-Z])/g, "$1\n\n")
-    .replace(/(Facility:|Booking Method:|Availability:|Link:|URL:)/g, "\n$1")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -17,30 +14,35 @@ function formatMessageWithLinks(text) {
   const urlRegex =
     /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(sg|com|org|net)[^\s]*)/g;
 
-  return text.split(urlRegex).map((part, index) => {
-    if (!part) return null;
+  return text.split("\n").map((line, lineIndex) => (
+    <span key={lineIndex}>
+      {line.split(urlRegex).map((part, index) => {
+        if (!part) return null;
 
-    const isUrl = part.match(urlRegex);
+        const isUrl = part.match(urlRegex);
 
-    if (!isUrl) return part;
+        if (!isUrl) return part;
 
-    const href =
-      part.startsWith("http://") || part.startsWith("https://")
-        ? part
-        : `https://${part}`;
+        const href =
+          part.startsWith("http://") || part.startsWith("https://")
+            ? part
+            : `https://${part}`;
 
-    return (
-      <a
-        key={index}
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="chat-link"
-      >
-        {part}
-      </a>
-    );
-  });
+        return (
+          <a
+            key={index}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="chat-link"
+          >
+            {part}
+          </a>
+        );
+      })}
+      {lineIndex < text.split("\n").length - 1 && <br />}
+    </span>
+  ));
 }
 
 function FileCard({ attachment }) {
@@ -59,6 +61,62 @@ function FileCard({ attachment }) {
         <span>{attachment.type}</span>
       </div>
     </div>
+  );
+}
+
+function SpeakButton({ text }) {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const { i18n } = useTranslation();
+
+  const langMap = {
+    en: "en-SG",
+    ms: "ms-MY",
+    zh: "zh-CN",
+    ta: "ta-IN"
+  };
+
+  const handleSpeak = () => {
+    if (!window.speechSynthesis) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = langMap[i18n.language] || "en-SG";
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  return (
+    <button
+      className={`speak-btn ${isSpeaking ? "speaking" : ""}`}
+      type="button"
+      onClick={handleSpeak}
+      title={isSpeaking ? "Stop" : "Listen"}
+    >
+      {isSpeaking ? (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+            d="M9 10h6v4H9z" />
+        </svg>
+      ) : (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+            d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-3-3m3 3l3-3M6.343 9.657a8 8 0 000 11.314" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+            d="M11 5L6 9H2v6h4l5 4V5z" />
+        </svg>
+      )}
+    </button>
   );
 }
 
@@ -122,6 +180,12 @@ export default function ChatArea({
                     {isUser
                       ? formatMessageWithLinks(msg.content)
                       : formatMessageWithLinks(cleanBotText(msg.content))}
+                  </div>
+                )}
+
+                {!isUser && msg.content && (
+                  <div className="speak-btn-wrapper">
+                    <SpeakButton text={cleanBotText(msg.content)} />
                   </div>
                 )}
               </div>
