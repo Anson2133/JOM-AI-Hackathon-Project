@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router";
 
 import ServiceStepper from "../components/ServiceJourneyStepper";
 import ServiceCard from "../components/RecommendationCard";
+import ServiceLocationMap from "../components/ServiceLocationMap";
 
 import { supportNeeds } from "../data/servicesData";
 import useServices from "../hooks/useServices";
@@ -614,7 +615,9 @@ function ServiceJourneyPage() {
               </p>
             </div>
           )}
-
+          <ServiceLocationMap
+            locations={selectedService.applicationLocations || []}
+          />
           <div className="journey-actions">
             <button className="journey-secondary-btn" onClick={goBack}>
               Back
