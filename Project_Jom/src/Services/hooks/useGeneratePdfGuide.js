@@ -14,6 +14,7 @@ export default function useGeneratePdfGuide() {
         service,
         selectedNeed,
         eligibilityResult,
+        serviceGuide,
     }) => {
         try {
             setGeneratingPdf(true);
@@ -34,6 +35,7 @@ export default function useGeneratePdfGuide() {
                     service,
                     selectedNeed,
                     eligibilityResult,
+                    serviceGuide,
                 }),
             });
 

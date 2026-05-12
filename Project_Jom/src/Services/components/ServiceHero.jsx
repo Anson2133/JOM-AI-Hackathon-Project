@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 
-function ServicesHero() {
+function ServicesHero({ searchTerm, onSearchChange }) {
   return (
     <section className="services-hero">
       <h1>How can we help you today?</h1>
@@ -15,9 +15,15 @@ function ServicesHero() {
 
         <input
           type="text"
-          placeholder="Search for services, support, or assistance..."
+          placeholder="Search money, medical, jobs, elderly, school..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
+
+      <p className="services-search-helper">
+        Search shows up to 4 closest matches. For complex situations, use the AI assistant.
+      </p>
     </section>
   );
 }

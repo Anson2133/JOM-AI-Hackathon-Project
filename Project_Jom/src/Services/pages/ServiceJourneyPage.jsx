@@ -9,6 +9,7 @@ import useServices from "../hooks/useServices";
 import useServiceMatch from "../hooks/useServiceMatch";
 import useGeneratePdfGuide from "../hooks/useGeneratePdfGuide";
 import useSendGuideEmail from "../hooks/useSendGuideEmail";
+import useGenerateServiceGuide from "../hooks/useGenerateServiceGuide";
 
 import "../services.css";
 
@@ -16,8 +17,9 @@ function ServiceJourneyPage() {
   const { categoryId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const serviceIdFromChat = searchParams.get("serviceId");
+  const serviceIdFromUrl = searchParams.get("serviceId");
   const fromChat = searchParams.get("fromChat") === "true";
+  const fromSearch = searchParams.get("fromSearch") === "true";
 
   const { services, loading } = useServices();
 
@@ -28,19 +30,7 @@ function ServiceJourneyPage() {
   const [eligibilityResult, setEligibilityResult] = useState(null);
   const [pdfEmail, setPdfEmail] = useState("");
   const [matchProgress, setMatchProgress] = useState(0);
-
-  useEffect(() => {
-    if (!fromChat || !serviceIdFromChat || loading || selectedService) return;
-
-    const exactService = services.find(
-      (service) => service.serviceId === serviceIdFromChat
-    );
-
-    if (!exactService) return;
-
-    setSelectedService(exactService);
-    setCurrentStep(5);
-  }, [fromChat, serviceIdFromChat, loading, services, selectedService]);
+  const [autoCheckedServiceId, setAutoCheckedServiceId] = useState(null);
 
   const cachedProfile = JSON.parse(
     localStorage.getItem("cachedProfile") || "{}"
@@ -49,7 +39,7 @@ function ServiceJourneyPage() {
   const needs = supportNeeds[categoryId] || [];
 
   const goNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 6));
+    setCurrentStep((prev) => Math.min(prev + 1, 7));
   };
 
   const goBack = () => {
@@ -78,6 +68,87 @@ function ServiceJourneyPage() {
     emailSent,
     sendGuideEmail,
   } = useSendGuideEmail();
+
+  const {
+    generatingServiceGuide,
+    serviceGuideError,
+    serviceGuide,
+    generateServiceGuide,
+    resetServiceGuide,
+  } = useGenerateServiceGuide();
+
+  useEffect(() => {
+    if (!serviceIdFromUrl || loading || selectedService) return;
+
+    const exactService = services.find(
+      (service) => String(service.serviceId) === String(serviceIdFromUrl)
+    );
+
+    if (!exactService) return;
+
+    setSelectedService(exactService);
+    setEligibilityResult(null);
+    setAutoCheckedServiceId(null);
+    setCurrentStep(4);
+  }, [serviceIdFromUrl, loading, services, selectedService]);
+
+  useEffect(() => {
+    if (currentStep !== 4) return;
+    if (!selectedService?.serviceId) return;
+    if (!(fromSearch || fromChat)) return;
+    if (autoCheckedServiceId === selectedService.serviceId) return;
+    if (matchingLoading) return;
+
+    const runAutoEligibilityCheck = async () => {
+      setAutoCheckedServiceId(selectedService.serviceId);
+
+      const result = await checkEligibility({
+        serviceId: selectedService.serviceId,
+        selectedNeedId: selectedNeed?.id,
+        answers: {},
+      });
+
+      if (result) {
+        setEligibilityResult(result);
+        resetServiceGuide();
+      }
+    };
+
+    runAutoEligibilityCheck();
+  }, [
+    currentStep,
+    selectedService?.serviceId,
+    selectedNeed?.id,
+    fromSearch,
+    fromChat,
+    autoCheckedServiceId,
+    matchingLoading,
+    checkEligibility,
+    resetServiceGuide,
+  ]);
+
+  useEffect(() => {
+    if (currentStep !== 5) return;
+    if (!selectedService) return;
+    if (serviceGuide) return;
+    if (generatingServiceGuide) return;
+
+    generateServiceGuide({
+      service: selectedService,
+      selectedNeed,
+      eligibilityResult,
+      profile: cachedProfile,
+    });
+  }, [
+    currentStep,
+    selectedService,
+    selectedNeed,
+    eligibilityResult,
+    cachedProfile,
+    serviceGuide,
+    generatingServiceGuide,
+    generateServiceGuide,
+  ]);
 
   const handleEligibilityAnswer = (question, value) => {
     setEligibilityAnswers((prev) => ({
@@ -243,7 +314,8 @@ function ServiceJourneyPage() {
               </div>
 
               <p>
-                Checking your profile, selected need, service eligibility rules, and AI review.
+                Checking your profile, selected need, service eligibility rules,
+                and AI review.
               </p>
             </div>
           )}
@@ -274,6 +346,8 @@ function ServiceJourneyPage() {
                     setSelectedService(service);
                     setEligibilityAnswers({});
                     setEligibilityResult(null);
+                    setAutoCheckedServiceId(null);
+                    resetServiceGuide();
                     setCurrentStep(4);
                   }}
                 />
@@ -298,8 +372,15 @@ function ServiceJourneyPage() {
             This does not permanently update your profile.
           </p>
 
+          {matchingLoading && (fromSearch || fromChat) && !eligibilityResult && (
+            <div className="eligibility-auto-check-box">
+              Checking your saved profile against this service...
+            </div>
+          )}
+
           <div className="eligibility-summary-box">
             <h2>{eligibilityStatus}</h2>
+
             <p>
               {eligibilityResult?.note ||
                 selectedService.aiReason ||
@@ -363,6 +444,7 @@ function ServiceJourneyPage() {
                           }
                         >
                           <option value="">Select an answer</option>
+
                           {question.options.map((option) => (
                             <option key={option} value={option}>
                               {option}
@@ -421,6 +503,7 @@ function ServiceJourneyPage() {
 
                 if (result) {
                   setEligibilityResult(result);
+                  resetServiceGuide();
                 }
               }}
             >
@@ -437,12 +520,141 @@ function ServiceJourneyPage() {
       )}
 
       {currentStep === 5 && selectedService && (
+        <section className="journey-card service-guide-card">
+          <div className="service-guide-header">
+            <div>
+              <span className="service-guide-pill">AI Service Guide</span>
+
+              <h1>{selectedService.serviceName}</h1>
+
+              <p className="journey-subtitle">
+                This guide explains the service in simple terms before you prepare
+                your documents.
+              </p>
+            </div>
+          </div>
+
+          {generatingServiceGuide && (
+            <div className="service-guide-loading">
+              <strong>Generating service guide...</strong>
+
+              <p>
+                Organising the service description, eligibility result, documents,
+                and application steps.
+              </p>
+            </div>
+          )}
+
+          {serviceGuideError && (
+            <div className="service-guide-error">
+              <strong>Unable to generate AI guide</strong>
+
+              <p>{serviceGuideError}</p>
+
+              <p>You can still continue to the documents step.</p>
+            </div>
+          )}
+
+          {!generatingServiceGuide && serviceGuide && (
+            <div className="service-guide-layout">
+              <div className="service-guide-section full">
+                <h2>What this service is about</h2>
+                <p>{serviceGuide.overview}</p>
+              </div>
+
+              <div className="service-guide-section">
+                <h2>Who this may help</h2>
+
+                <ul>
+                  {(serviceGuide.whoThisHelps || []).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="service-guide-section">
+                <h2>What support it may provide</h2>
+
+                <ul>
+                  {(serviceGuide.possibleBenefits || []).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="service-guide-section full">
+                <h2>Why this may fit your situation</h2>
+                <p>{serviceGuide.whyThisMayFitYou}</p>
+              </div>
+
+              <div className="service-guide-section">
+                <h2>Before you apply</h2>
+
+                <ul>
+                  {(serviceGuide.beforeYouApply || []).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="service-guide-section">
+                <h2>Important note</h2>
+                <p>{serviceGuide.importantNote}</p>
+              </div>
+            </div>
+          )}
+
+          {!generatingServiceGuide && !serviceGuide && (
+            <div className="service-guide-fallback">
+              <h2>{selectedService.serviceName}</h2>
+
+              <p>
+                {selectedService.description ||
+                  "No detailed service description is available."}
+              </p>
+            </div>
+          )}
+
+          <div className="journey-actions">
+            <button className="journey-secondary-btn" onClick={goBack}>
+              Back
+            </button>
+
+            <button
+              className="journey-secondary-btn"
+              disabled={generatingServiceGuide}
+              onClick={() =>
+                generateServiceGuide({
+                  service: selectedService,
+                  selectedNeed,
+                  eligibilityResult,
+                  profile: cachedProfile,
+                })
+              }
+            >
+              Regenerate Guide
+            </button>
+
+            <button className="journey-primary-btn" onClick={goNext}>
+              Continue to Documents
+            </button>
+          </div>
+        </section>
+      )}
+
+      {currentStep === 6 && selectedService && (
         <section className="journey-card">
           <h1>Required Documents</h1>
 
           {fromChat && (
             <p className="journey-subtitle">
               This service was opened from your chatbot recommendation.
+            </p>
+          )}
+
+          {fromSearch && (
+            <p className="journey-subtitle">
+              This service was opened from your search results.
             </p>
           )}
 
@@ -482,7 +694,7 @@ function ServiceJourneyPage() {
         </section>
       )}
 
-      {currentStep === 6 && selectedService && (
+      {currentStep === 7 && selectedService && (
         <section className="journey-card">
           <h1>Continue to Official Site</h1>
 
@@ -492,6 +704,7 @@ function ServiceJourneyPage() {
 
           <div className="official-site-box">
             <h2>{selectedService.serviceName}</h2>
+
             <p>{selectedService.description}</p>
 
             <a
@@ -515,6 +728,7 @@ function ServiceJourneyPage() {
                     service: selectedService,
                     selectedNeed,
                     eligibilityResult,
+                    serviceGuide,
                   })
                 }
               >
@@ -569,7 +783,10 @@ function ServiceJourneyPage() {
                       {sendingEmail ? "Sending..." : "Send Email"}
                     </button>
 
-                    {emailSent && <p className="success-text">Email sent successfully.</p>}
+                    {emailSent && (
+                      <p className="success-text">Email sent successfully.</p>
+                    )}
+
                     {emailError && <p className="error-text">{emailError}</p>}
                   </div>
                 </div>

@@ -4,9 +4,11 @@ function ServiceStepper({ currentStep = 1 }) {
     "Profile Match",
     "Recommendations",
     "Eligibility Check",
+    "Service Guide",
     "Documents",
     "Official Site",
   ];
+
   return (
     <div className="service-stepper">
       {steps.map((step, index) => {
@@ -15,8 +17,7 @@ function ServiceStepper({ currentStep = 1 }) {
         return (
           <div
             key={step}
-            className={`step-item ${currentStep >= stepNumber ? "active" : ""
-              }`}
+            className={`step-item ${currentStep >= stepNumber ? "active" : ""}`}
           >
             <div className="step-circle">
               {stepNumber}
