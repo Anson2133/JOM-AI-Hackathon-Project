@@ -1,11 +1,23 @@
-import { Edit } from "lucide-react";
+import { BadgeCheck, UserRound } from "lucide-react";
 
-function ProfileHero({ profile, user }) {
-  const name = user?.name || profile?.identity?.name || "Demo Resident";
-  const lifeStage = profile?.derivedContext?.lifeStage || "Tampines resident";
-  const nationality = profile?.identity?.nationality || "Resident";
+function formatValue(value) {
+  if (!value) return "-";
 
-  const initials = name
+  return String(value)
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function ProfileHero({ user, profile }) {
+  const displayName =
+    user?.displayName ||
+    user?.name ||
+    profile?.displayName ||
+    profile?.identity?.name ||
+    "Demo Resident";
+
+  const initials = displayName
     .split(" ")
     .map((word) => word[0])
     .join("")
@@ -14,26 +26,42 @@ function ProfileHero({ profile, user }) {
 
   return (
     <section className="profile-hero">
-      <div className="profile-hero-left">
-        <div className="profile-hero-avatar">{initials}</div>
+      <div className="profile-hero-content">
+        <div className="profile-avatar">{initials}</div>
 
-        <div>
-          <h1>{name}</h1>
-          <p>
-            {lifeStage} · {nationality}
+        <div className="profile-hero-text">
+          <p className="profile-eyebrow">
+            <BadgeCheck size={16} />
+            Resident Service Profile
           </p>
 
-          <div className="active-profile-pill">
-            <span></span>
-            Active profile
-          </div>
+          <h1>{displayName}</h1>
+
+          <p>
+            We use your general profile information to recommend suitable
+            service areas and reduce repeated eligibility checks.
+          </p>
         </div>
       </div>
 
-      <button className="edit-profile-button">
-        <Edit size={22} />
-        Edit Profile
-      </button>
+      <div className="profile-hero-summary">
+        <div>
+          <span>Residential Status</span>
+          <strong>{formatValue(profile?.residentialStatus || "Resident")}</strong>
+        </div>
+
+        <div>
+          <span>Profile Type</span>
+          <strong>
+            {formatValue(profile?.profileType || profile?.demoResidentId)}
+          </strong>
+        </div>
+
+        <div>
+          <span>Matching Status</span>
+          <strong>Ready</strong>
+        </div>
+      </div>
     </section>
   );
 }

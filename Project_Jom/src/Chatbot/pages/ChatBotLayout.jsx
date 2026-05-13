@@ -2,13 +2,14 @@ import Sidebar from "../components/Sidebar";
 import ChatArea from "../components/ChatArea";
 import InputBar from "../components/InputBar";
 import useChatbot from "../hooks/useChatbot";
-import "../../Chatbot/chatbot.css";
+import "../chatbot.css";
 
 export default function ChatbotLayout() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const profile = JSON.parse(localStorage.getItem("profile") || "{}");
+  const cachedProfile = JSON.parse(
+    localStorage.getItem("cachedProfile") || "{}"
+  );
 
-  const name = user?.name || profile?.identity?.name || "Demo Resident";
+  const name = cachedProfile?.displayName || "Resident";
 
   const userInitials = name
     .split(" ")
@@ -17,8 +18,7 @@ export default function ChatbotLayout() {
     .slice(0, 2)
     .toUpperCase();
 
-  const userId =
-    profile?.userId || user?.userId || user?.id || "demo-user-001";
+  const userId = localStorage.getItem("userId") || "demo-user-001";
 
   const {
     inputText,

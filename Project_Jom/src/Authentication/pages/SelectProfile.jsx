@@ -1,16 +1,14 @@
 import { useNavigate } from "react-router";
 import { Info } from "lucide-react";
-import Header from "../components/Header";
 import ProfileCard from "../components/ProfileCard";
 import demoProfiles from "../data/demoProfiles";
-import "../../Authentication/selectProfile.css";
+import "../selectProfile.css";
 
 function SelectProfilePage() {
   const navigate = useNavigate();
 
   return (
     <div className="select-profile-layout">
-      <Header />
 
       <main className="select-profile-main">
         {/* Hero Banner */}

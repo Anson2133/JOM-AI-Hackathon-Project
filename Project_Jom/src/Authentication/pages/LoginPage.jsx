@@ -6,14 +6,13 @@ import FeaturesSection from '../components/FeaturesSection';
 import HowItWorksSection from '../components/HowItWorksSection';
 import CTASection from '../components/CTASection';
 import Footer from '../components/Footer';
-import Header from '../../Authentication/components/Header';
-import "../../Authentication/auth.css"
-import "../../Authentication/landing.css";
+import "../auth.css";
+import "../landing.css";
 
 export default function LoginPage() {
     return (
         <>
-            <Header />
+           
             <main>
                 <HeroSection />
                 <ServicesSection />

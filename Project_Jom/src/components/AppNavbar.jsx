@@ -3,7 +3,6 @@ import {
   MessageSquare,
   MapPin,
   Globe,
-  Mic,
   LogOut,
   User,
   ChevronDown,
@@ -19,10 +18,10 @@ function AppNavbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const profile = JSON.parse(localStorage.getItem("cachedProfile") || "{}");
 
-  const initials = user?.name
-    ? user.name
+  const initials = profile?.displayName
+    ? profile.displayName
         .split(" ")
         .map((word) => word[0])
         .join("")
@@ -64,8 +63,8 @@ function AppNavbar() {
         </div>
 
         <nav className="navbar-links">
-          <NavLink to="/chat">{t("nav.chat")}</NavLink>
           <NavLink to="/services">{t("nav.services")}</NavLink>
+          <NavLink to="/chat">{t("nav.chat")}</NavLink>
           <NavLink to="/history">{t("nav.history")}</NavLink>
           <NavLink to="/help">{t("nav.help")}</NavLink>
         </nav>
@@ -92,8 +91,6 @@ function AppNavbar() {
             )}
           </div>
 
-          <Mic size={22} className="navbar-icon" />
-
           <div className="profile-menu-wrapper">
             <button
               className="profile-menu-button"
@@ -109,8 +106,8 @@ function AppNavbar() {
                 <div className="profile-dropdown-header">
                   <div className="dropdown-avatar">{initials}</div>
                   <div>
-                    <strong>{user?.name || "Demo Resident"}</strong>
-                    <p>{user?.partialUinfin || "Active profile"}</p>
+                    <strong>{profile?.displayName || "Demo Resident"}</strong>
+                    <p>{profile?.partialUinfin || "Active profile"}</p>
                   </div>
                 </div>
 
@@ -126,9 +123,13 @@ function AppNavbar() {
                   {t("common.editProfile")}
                 </button>
 
-                <button className="dropdown-item logout" type="button" onClick={logout}>
+                <button
+                  className="dropdown-item logout"
+                  type="button"
+                  onClick={logout}
+                >
                   <LogOut size={18} />
-                  {t("common.logout")}
+                  {t("logout")}
                 </button>
               </div>
             )}
