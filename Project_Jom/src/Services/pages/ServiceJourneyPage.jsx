@@ -22,18 +22,25 @@ function ServiceJourneyPage() {
   const fromChat = searchParams.get("fromChat") === "true";
   const fromSearch = searchParams.get("fromSearch") === "true";
 
+  const isDirectEntry = Boolean(serviceIdFromUrl || fromChat || fromSearch);
+
   const { services, loading } = useServices();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedNeed, setSelectedNeed] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+
   const [eligibilityAnswers, setEligibilityAnswers] = useState({});
   const [eligibilityResult, setEligibilityResult] = useState(null);
+
   const [pdfEmail, setPdfEmail] = useState("");
   const [matchProgress, setMatchProgress] = useState(0);
-  const [autoCheckedServiceId, setAutoCheckedServiceId] = useState(null);
+
   const [dynamicExtraQuestions, setDynamicExtraQuestions] = useState([]);
-  const [questionsGeneratedServiceId, setQuestionsGeneratedServiceId] = useState(null);
+  const [questionsLoadedForServiceId, setQuestionsLoadedForServiceId] =
+    useState(null);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
+  const [questionError, setQuestionError] = useState("");
 
   const cachedProfile = JSON.parse(
     localStorage.getItem("cachedProfile") || "{}"
@@ -41,17 +48,8 @@ function ServiceJourneyPage() {
 
   const needs = supportNeeds[categoryId] || [];
 
-  const goNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 7));
-  };
-
-  const goBack = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
   const {
     matches,
-    profileUsed,
     loading: matchingLoading,
     error: matchingError,
     matchServices,
@@ -59,19 +57,11 @@ function ServiceJourneyPage() {
     generateQuestions,
   } = useServiceMatch();
 
-  const {
-    generatingPdf,
-    pdfError,
-    pdfResult,
-    generatePdfGuide,
-  } = useGeneratePdfGuide();
+  const { generatingPdf, pdfError, pdfResult, generatePdfGuide } =
+    useGeneratePdfGuide();
 
-  const {
-    sendingEmail,
-    emailError,
-    emailSent,
-    sendGuideEmail,
-  } = useSendGuideEmail();
+  const { sendingEmail, emailError, emailSent, sendGuideEmail } =
+    useSendGuideEmail();
 
   const {
     generatingServiceGuide,
@@ -80,6 +70,25 @@ function ServiceJourneyPage() {
     generateServiceGuide,
     resetServiceGuide,
   } = useGenerateServiceGuide();
+
+  const goNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, 7));
+  };
+
+  const goBack = () => {
+    if (isDirectEntry) return;
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const resetEligibilityState = () => {
+    setEligibilityAnswers({});
+    setEligibilityResult(null);
+    setDynamicExtraQuestions([]);
+    setQuestionsLoadedForServiceId(null);
+    setQuestionsLoading(false);
+    setQuestionError("");
+    resetServiceGuide();
+  };
 
   useEffect(() => {
     if (!serviceIdFromUrl || loading || selectedService) return;
@@ -91,89 +100,78 @@ function ServiceJourneyPage() {
     if (!exactService) return;
 
     setSelectedService(exactService);
-    setEligibilityResult(null);
+
     setEligibilityAnswers({});
-    setAutoCheckedServiceId(null);
+    setEligibilityResult(null);
     setDynamicExtraQuestions([]);
-    setQuestionsGeneratedServiceId(null);
+    setQuestionsLoadedForServiceId(null);
+    setQuestionsLoading(false);
+    setQuestionError("");
+    resetServiceGuide();
+
     setCurrentStep(4);
-  }, [serviceIdFromUrl, loading, services, selectedService]);
+  }, [serviceIdFromUrl, loading, services, selectedService, resetServiceGuide]);
 
   useEffect(() => {
     if (currentStep !== 4) return;
     if (!selectedService?.serviceId) return;
-    if (!(fromSearch || fromChat)) return;
-    if (autoCheckedServiceId === selectedService.serviceId) return;
-    if (matchingLoading) return;
 
-    const runAutoEligibilityCheck = async () => {
-      setAutoCheckedServiceId(selectedService.serviceId);
+    const serviceId = String(selectedService.serviceId);
 
-      const result = await checkEligibility({
-        serviceId: selectedService.serviceId,
-        selectedNeedId: selectedNeed?.id,
-        answers: {},
-      });
+    if (questionsLoadedForServiceId === serviceId) return;
 
-      if (result) {
-        setEligibilityResult(result);
-        resetServiceGuide();
-      }
-    };
+    let active = true;
 
-    runAutoEligibilityCheck();
-  }, [
-    currentStep,
-    selectedService?.serviceId,
-    selectedNeed?.id,
-    fromSearch,
-    fromChat,
-    autoCheckedServiceId,
-    matchingLoading,
-    checkEligibility,
-    resetServiceGuide,
-  ]);
-
-  useEffect(() => {
-    if (currentStep !== 4) return;
-    if (!selectedService?.serviceId) return;
-    if (!(fromSearch || fromChat)) return;
-    if (questionsGeneratedServiceId === selectedService.serviceId) return;
-    if (matchingLoading) return;
-
-    let cancelled = false;
-
-    const runAiQuestionGeneration = async () => {
-      setQuestionsGeneratedServiceId(selectedService.serviceId);
-
-      const questions = await generateQuestions({
-        serviceId: selectedService.serviceId,
-        selectedNeedId: selectedNeed?.id,
-      });
-
-      if (!cancelled && Array.isArray(questions) && questions.length > 0) {
-        setDynamicExtraQuestions(questions);
+    const runQuestionGeneration = async () => {
+      try {
+        setQuestionsLoading(true);
+        setQuestionError("");
+        setDynamicExtraQuestions([]);
         setEligibilityAnswers({});
         setEligibilityResult(null);
-        resetServiceGuide();
+
+        const questions = await generateQuestions({
+          serviceId: selectedService.serviceId,
+          selectedNeedId: selectedNeed?.id,
+        });
+
+        if (!active) return;
+
+        const safeQuestions = Array.isArray(questions) ? questions : [];
+
+        console.log("[ServiceJourneyPage] questions to render", safeQuestions);
+
+        setDynamicExtraQuestions(safeQuestions);
+        setQuestionsLoadedForServiceId(serviceId);
+      } catch (error) {
+        console.error("Failed to prepare eligibility questions", error);
+
+        if (!active) return;
+
+        setDynamicExtraQuestions([]);
+        setQuestionsLoadedForServiceId(serviceId);
+        setQuestionError(
+          error.message ||
+          "Unable to prepare eligibility questions. You can still continue."
+        );
+      } finally {
+        if (active) {
+          setQuestionsLoading(false);
+        }
       }
     };
 
-    runAiQuestionGeneration();
+    runQuestionGeneration();
 
     return () => {
-      cancelled = true;
+      active = false;
     };
+
   }, [
     currentStep,
     selectedService?.serviceId,
     selectedNeed?.id,
-    fromSearch,
-    fromChat,
-    questionsGeneratedServiceId,
-    matchingLoading,
-    generateQuestions,
-    resetServiceGuide,
+    questionsLoadedForServiceId,
   ]);
 
   useEffect(() => {
@@ -199,43 +197,68 @@ function ServiceJourneyPage() {
     generateServiceGuide,
   ]);
 
-  const handleEligibilityAnswer = (question, value) => {
+  const handleEligibilityAnswer = (questionKey, value) => {
     setEligibilityAnswers((prev) => ({
       ...prev,
-      [question]: value,
+      [questionKey]: value,
     }));
 
     setEligibilityResult(null);
   };
-
-  const extraQuestions =
-    dynamicExtraQuestions.length > 0
-      ? dynamicExtraQuestions
-      : selectedService?.extraQuestions || [];
 
   const getQuestionKey = (question, index) =>
     typeof question === "string"
       ? question
       : question.id || question.label || `question-${index}`;
 
-  const answeredCount = extraQuestions.filter((q, index) => {
-    const key = getQuestionKey(q, index);
-    return eligibilityAnswers[key]?.trim();
+  const questionsReady =
+    selectedService?.serviceId &&
+    questionsLoadedForServiceId === String(selectedService.serviceId) &&
+    !questionsLoading;
+
+  const extraQuestions = questionsReady ? dynamicExtraQuestions : [];
+
+  const answeredCount = extraQuestions.filter((question, index) => {
+    const key = getQuestionKey(question, index);
+    return String(eligibilityAnswers[key] || "").trim();
   }).length;
 
   const allQuestionsAnswered =
     extraQuestions.length === 0 || answeredCount === extraQuestions.length;
 
+  const hasNoExtraQuestions = questionsReady && extraQuestions.length === 0;
+
+  const showRecheckButton = questionsReady && extraQuestions.length > 0;
+
+  const showContinueButton =
+    hasNoExtraQuestions || Boolean(eligibilityResult) || Boolean(questionError);
+
   const eligibilityStatus = eligibilityResult
     ? eligibilityResult.eligibilityStatus
-    : extraQuestions.length === 0
-      ? "Ready to recheck eligibility"
-      : answeredCount === extraQuestions.length
-        ? "Ready to recheck eligibility"
-        : "Needs more information";
+    : questionsLoading
+      ? "Checking what information is needed"
+      : hasNoExtraQuestions
+        ? "Ready to continue"
+        : extraQuestions.length > 0 && allQuestionsAnswered
+          ? "Ready to recheck eligibility"
+          : "Needs more information";
+
+  const eligibilitySummaryText = eligibilityResult?.note
+    ? eligibilityResult.note
+    : questionsLoading
+      ? "Checking your saved profile and preparing only the questions still needed."
+      : questionError
+        ? "We could not prepare extra questions right now, but you can continue to view the service guide."
+        : hasNoExtraQuestions
+          ? "No additional questions are required based on your saved profile. You may continue to the service guide."
+          : selectedService?.aiReason ||
+          "This service may be suitable based on your profile and selected need.";
 
   const currentMissingInfo =
-    eligibilityResult?.missingInfo || selectedService?.missingInfo || [];
+    questionsLoading || hasNoExtraQuestions
+      ? []
+      : eligibilityResult?.missingInfo ||
+      (extraQuestions.length > 0 ? selectedService?.missingInfo || [] : []);
 
   const usefulEligibilityReasons = (
     eligibilityResult?.reasons ||
@@ -244,10 +267,7 @@ function ServiceJourneyPage() {
   ).filter((reason) => {
     const text = String(reason || "").toLowerCase();
 
-    return (
-      reason &&
-      !text.includes("this service is in your selected category")
-    );
+    return reason && !text.includes("this service is in your selected category");
   });
 
   const startMatchProgress = () => {
@@ -300,7 +320,8 @@ function ServiceJourneyPage() {
           <h1>Check Profile Match</h1>
 
           <p className="journey-subtitle">
-            We use your saved service-matching profile to estimate relevant services.
+            We use your saved service-matching profile to estimate relevant
+            services.
           </p>
 
           <div className="profile-match-box">
@@ -336,9 +357,11 @@ function ServiceJourneyPage() {
           </div>
 
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
 
             <button
               className="journey-primary-btn"
@@ -363,7 +386,9 @@ function ServiceJourneyPage() {
                 }, 400);
               }}
             >
-              {matchingLoading ? "Finding Services..." : "Find Recommended Services"}
+              {matchingLoading
+                ? "Finding Services..."
+                : "Find Recommended Services"}
             </button>
           </div>
 
@@ -412,12 +437,7 @@ function ServiceJourneyPage() {
                   service={service}
                   onViewGuidance={() => {
                     setSelectedService(service);
-                    setEligibilityAnswers({});
-                    setEligibilityResult(null);
-                    setAutoCheckedServiceId(null);
-                    setDynamicExtraQuestions([]);
-                    setQuestionsGeneratedServiceId(null);
-                    resetServiceGuide();
+                    resetEligibilityState();
                     setCurrentStep(4);
                   }}
                 />
@@ -426,9 +446,11 @@ function ServiceJourneyPage() {
           )}
 
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
           </div>
         </section>
       )}
@@ -438,24 +460,20 @@ function ServiceJourneyPage() {
           <h1>Check If You May Be Eligible</h1>
 
           <p className="journey-subtitle">
-            Answer the extra questions for this policy, then recheck eligibility.
-            This does not permanently update your profile.
+            We check your saved profile first. Extra questions are only shown
+            when this service needs missing information.
           </p>
 
-          {matchingLoading && (fromSearch || fromChat) && !eligibilityResult && (
+          {questionsLoading && (
             <div className="eligibility-auto-check-box">
-              Checking your saved profile against this service...
+              Checking your saved profile and preparing only the questions still
+              needed...
             </div>
           )}
 
           <div className="eligibility-summary-box">
             <h2>{eligibilityStatus}</h2>
-
-            <p>
-              {eligibilityResult?.note ||
-                selectedService.aiReason ||
-                "This service may be suitable based on your profile and selected need."}
-            </p>
+            <p>{eligibilitySummaryText}</p>
 
             {eligibilityResult && (
               <p>
@@ -464,6 +482,15 @@ function ServiceJourneyPage() {
               </p>
             )}
           </div>
+
+          {questionError && (
+            <div className="eligibility-note-panel warning">
+              <h2>Eligibility check note</h2>
+              <ul>
+                <li>{questionError}</li>
+              </ul>
+            </div>
+          )}
 
           {currentMissingInfo.length > 0 && (
             <div className="eligibility-note-panel warning">
@@ -477,7 +504,17 @@ function ServiceJourneyPage() {
             </div>
           )}
 
-          {extraQuestions.length > 0 ? (
+        
+
+          {questionsLoading ? (
+            <div className="eligibility-note-panel">
+              <h2>Preparing eligibility check</h2>
+              <ul>
+                <li>Checking your saved profile first.</li>
+                <li>Only missing follow-up questions will be shown.</li>
+              </ul>
+            </div>
+          ) : extraQuestions.length > 0 ? (
             <>
               <h2>Extra Questions</h2>
 
@@ -540,9 +577,21 @@ function ServiceJourneyPage() {
                 })}
               </div>
             </>
-          ) : (
-            <p>No additional questions required for this service.</p>
-          )}
+          ) : questionsReady || questionError ? (
+            <div className="eligibility-note-panel">
+              <h2>No extra questions needed</h2>
+              <ul>
+                <li>
+                  Your saved profile already has enough information to continue
+                  to the service guide.
+                </li>
+                <li>
+                  You can still review official eligibility requirements on the
+                  agency website before applying.
+                </li>
+              </ul>
+            </div>
+          ) : null}
 
           {eligibilityResult && usefulEligibilityReasons.length > 0 && (
             <div className="eligibility-note-panel">
@@ -557,30 +606,34 @@ function ServiceJourneyPage() {
           )}
 
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
 
-            <button
-              className="journey-primary-btn"
-              disabled={!allQuestionsAnswered || matchingLoading}
-              onClick={async () => {
-                const result = await checkEligibility({
-                  serviceId: selectedService.serviceId,
-                  selectedNeedId: selectedNeed?.id,
-                  answers: eligibilityAnswers,
-                });
+            {showRecheckButton && (
+              <button
+                className="journey-primary-btn"
+                disabled={!allQuestionsAnswered || matchingLoading}
+                onClick={async () => {
+                  const result = await checkEligibility({
+                    serviceId: selectedService.serviceId,
+                    selectedNeedId: selectedNeed?.id,
+                    answers: eligibilityAnswers,
+                  });
 
-                if (result) {
-                  setEligibilityResult(result);
-                  resetServiceGuide();
-                }
-              }}
-            >
-              {matchingLoading ? "Rechecking..." : "Recheck Eligibility"}
-            </button>
+                  if (result) {
+                    setEligibilityResult(result);
+                    resetServiceGuide();
+                  }
+                }}
+              >
+                {matchingLoading ? "Rechecking..." : "Recheck Eligibility"}
+              </button>
+            )}
 
-            {eligibilityResult && (
+            {showContinueButton && (
               <button className="journey-primary-btn" onClick={goNext}>
                 Continue
               </button>
@@ -598,8 +651,8 @@ function ServiceJourneyPage() {
               <h1>{selectedService.serviceName}</h1>
 
               <p className="journey-subtitle">
-                This guide explains the service in simple terms before you prepare
-                your documents.
+                This guide explains the service in simple terms before you
+                prepare your documents.
               </p>
             </div>
           </div>
@@ -609,8 +662,8 @@ function ServiceJourneyPage() {
               <strong>Generating service guide...</strong>
 
               <p>
-                Organising the service description, eligibility result, documents,
-                and application steps.
+                Organising the service description, eligibility result,
+                documents, and application steps.
               </p>
             </div>
           )}
@@ -684,13 +737,17 @@ function ServiceJourneyPage() {
               </p>
             </div>
           )}
+
           <ServiceLocationMap
             locations={selectedService.applicationLocations || []}
           />
+
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
 
             <button
               className="journey-secondary-btn"
@@ -755,9 +812,11 @@ function ServiceJourneyPage() {
           </div>
 
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
 
             <button className="journey-primary-btn" onClick={goNext}>
               Continue
@@ -771,7 +830,8 @@ function ServiceJourneyPage() {
           <h1>Continue to Official Site</h1>
 
           <p className="journey-subtitle">
-            Use the official link below to apply or continue reading more details.
+            Use the official link below to apply or continue reading more
+            details.
           </p>
 
           <div className="official-site-box">
@@ -795,7 +855,8 @@ function ServiceJourneyPage() {
                 disabled={generatingPdf}
                 onClick={() =>
                   generatePdfGuide({
-                    residentName: cachedProfile.name,
+                    residentName:
+                      cachedProfile.displayName || cachedProfile.name || "",
                     email: "",
                     service: selectedService,
                     selectedNeed,
@@ -841,14 +902,19 @@ function ServiceJourneyPage() {
                     <button
                       className="email-send-btn"
                       type="button"
-                      disabled={sendingEmail || !pdfEmail || !pdfResult?.downloadUrl}
+                      disabled={
+                        sendingEmail || !pdfEmail || !pdfResult?.downloadUrl
+                      }
                       onClick={() =>
                         sendGuideEmail({
                           email: pdfEmail,
                           downloadUrl: pdfResult.downloadUrl,
                           referenceNo: pdfResult.referenceNo,
                           serviceName: selectedService.serviceName,
-                          residentName: cachedProfile.name,
+                          residentName:
+                            cachedProfile.displayName ||
+                            cachedProfile.name ||
+                            "",
                         })
                       }
                     >
@@ -869,9 +935,11 @@ function ServiceJourneyPage() {
           </div>
 
           <div className="journey-actions">
-            <button className="journey-secondary-btn" onClick={goBack}>
-              Back
-            </button>
+            {!isDirectEntry && (
+              <button className="journey-secondary-btn" onClick={goBack}>
+                Back
+              </button>
+            )}
           </div>
         </section>
       )}

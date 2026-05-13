@@ -3,7 +3,6 @@ import {
   MessageSquare,
   MapPin,
   Globe,
-  Mic,
   LogOut,
   User,
   ChevronDown,
@@ -23,11 +22,11 @@ function AppNavbar() {
 
   const initials = profile?.displayName
     ? profile.displayName
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "U";
 
   const currentLanguage = i18n.language?.split("-")[0] || "en";
@@ -64,8 +63,8 @@ function AppNavbar() {
         </div>
 
         <nav className="navbar-links">
-          <NavLink to="/chat">{t("nav.chat")}</NavLink>
           <NavLink to="/services">{t("nav.services")}</NavLink>
+          <NavLink to="/chat">{t("nav.chat")}</NavLink>
           <NavLink to="/history">{t("nav.history")}</NavLink>
           <NavLink to="/help">{t("nav.help")}</NavLink>
         </nav>
@@ -91,8 +90,6 @@ function AppNavbar() {
               </div>
             )}
           </div>
-
-          <Mic size={22} className="navbar-icon" />
 
           <div className="profile-menu-wrapper">
             <button
@@ -126,7 +123,11 @@ function AppNavbar() {
                   {t("common.editProfile")}
                 </button>
 
-                <button className="dropdown-item logout" type="button" onClick={logout}>
+                <button
+                  className="dropdown-item logout"
+                  type="button"
+                  onClick={logout}
+                >
                   <LogOut size={18} />
                   {t("logout")}
                 </button>

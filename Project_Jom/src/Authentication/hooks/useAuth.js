@@ -18,9 +18,29 @@ export function useAuth() {
     }
 
     localStorage.setItem("sessionToken", data.sessionToken);
-    localStorage.setItem("userId", data.user.userId);
+    localStorage.setItem("userId", data.user?.userId);
 
-    window.location.href = "/profile";
+    // Save user for navbar/chat/profile fallback
+    localStorage.setItem("user", JSON.stringify(data.user || {}));
+
+    // Save profile immediately so Services/Chat/Navbar can use it
+    localStorage.setItem(
+      "cachedProfile",
+      JSON.stringify({
+        displayName:
+          data.user?.displayName ||
+          data.user?.name ||
+          data.profile?.displayName ||
+          data.profile?.identity?.name ||
+          "Demo Resident",
+        ...data.profile,
+      })
+    );
+
+    // Optional: keep old key too, if other parts of app still use "profile"
+    localStorage.setItem("profile", JSON.stringify(data.profile || {}));
+
+    window.location.href = "/services";
   };
 
   const logout = () => {

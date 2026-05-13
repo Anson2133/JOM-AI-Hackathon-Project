@@ -1575,3 +1575,16 @@
 .eligibility-note-panel li+li {
     margin-top: 6px;
 }
+
+.services-welcome-text {
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 18px !important;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff !important;
+  font-size: 0.95rem !important;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
