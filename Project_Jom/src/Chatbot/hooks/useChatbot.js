@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const CHATBOT_API_URL =
     "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/chat";
@@ -10,11 +11,36 @@ const TITLE_API_URL =
     "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/chat-title";
 
 export default function useChatbot({ name, userId }) {
+    const { i18n } = useTranslation();
+
+    const getCurrentLanguage = () => {
+        const lang = i18n.language || "en";
+
+        if (lang.startsWith("ms")) return "ms";
+        if (lang.startsWith("zh")) return "zh";
+        if (lang.startsWith("ta")) return "ta";
+
+        return "en";
+    };
+
+    const getWelcomeText = () => {
+        const currentLang = getCurrentLanguage();
+
+        const welcomeMessages = {
+            en: `Good morning ${name}. How can I help you today?`,
+            ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
+            zh: `早上好 ${name}。今天我能为您做什么？`,
+            ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`,
+        };
+
+        return welcomeMessages[currentLang] || welcomeMessages.en;
+    };
+
     const createWelcomeMessage = () => [
         {
             role: "ai",
             type: "text",
-            content: `Good morning ${name}. How can I help you today?`,
+            content: getWelcomeText(),
         },
     ];
 
@@ -70,6 +96,34 @@ export default function useChatbot({ name, userId }) {
             loadConversations();
         }
     }, [userId]);
+
+    useEffect(() => {
+        setMessages((prev) => {
+            if (prev.length === 0) return prev;
+
+            const firstMessage = prev[0];
+
+            const isWelcomeMessage =
+                firstMessage.role === "ai" &&
+                !firstMessage.documentContext &&
+                (
+                    firstMessage.content?.includes("Good morning") ||
+                    firstMessage.content?.includes("Selamat pagi") ||
+                    firstMessage.content?.includes("早上好") ||
+                    firstMessage.content?.includes("காலை வணக்கம்")
+                );
+
+            if (!isWelcomeMessage) return prev;
+
+            return [
+                {
+                    ...firstMessage,
+                    content: getWelcomeText(),
+                },
+                ...prev.slice(1),
+            ];
+        });
+    }, [i18n.language, name]);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -214,15 +268,8 @@ export default function useChatbot({ name, userId }) {
             (message) => message.documentContext
         )?.documentContext;
 
-        try {
-            const response = await fetch(CHATBOT_API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    message: latestDocumentContext
-                        ? `
+        const finalUserPrompt = latestDocumentContext
+            ? `
 The user is asking about a scanned document.
 
 Document context:
@@ -231,9 +278,19 @@ ${JSON.stringify(latestDocumentContext, null, 2)}
 User question:
 ${trimmedInput || "Please help me understand this document."}
 `
-                        : trimmedInput || "Please analyse this uploaded file.",
+            : trimmedInput || "Please analyse this uploaded file.";
+
+        try {
+            const response = await fetch(CHATBOT_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: finalUserPrompt,
                     file: attachment?.base64 || undefined,
                     fileType: attachment?.type || undefined,
+                    language: getCurrentLanguage(),
                 }),
             });
 
@@ -246,8 +303,7 @@ ${trimmedInput || "Please help me understand this document."}
             const aiMessage = {
                 role: "ai",
                 type: "text",
-                content:
-                    data?.response || "Sorry, I could not get a response.",
+                content: data?.response || "Sorry, I could not get a response.",
                 relatedServices: data?.relatedServices || [],
             };
 
@@ -272,6 +328,7 @@ ${trimmedInput || "Please help me understand this document."}
                 type: "text",
                 content:
                     "Sorry, I could not connect to the chatbot right now. Please try again later.",
+                relatedServices: [],
             };
 
             const finalMessages = [...messagesWithUser, errorMessage];
@@ -294,6 +351,7 @@ ${trimmedInput || "Please help me understand this document."}
 
     const handleNewChat = () => {
         const newConversation = {
+            userId,
             conversationId: `draft-${Date.now()}`,
             title: "New Chat",
             date: new Date().toISOString(),
@@ -310,9 +368,9 @@ ${trimmedInput || "Please help me understand this document."}
     };
 
     const handleSelectConversation = (conversation) => {
-        setChatTitle(conversation.title);
+        setChatTitle(conversation.title || "New Chat");
         setMessages(conversation.messages || createWelcomeMessage());
-        setCurrentConversationId(conversation.conversationId);
+        setCurrentConversationId(conversation.conversationId || conversation.id);
     };
 
     return {

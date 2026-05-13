@@ -12,8 +12,9 @@ export default function InputBar({
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [warning, setWarning] = useState("");
+    const [isListening, setIsListening] = useState(false);
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const supportedTypes = [
         "application/pdf",
@@ -78,20 +79,97 @@ export default function InputBar({
     const onSend = () => {
         if (isLoading) return;
 
+        const hasText = inputText.trim().length > 0;
+        const hasFile = Boolean(selectedFile);
+
+        if (!hasText && !hasFile) return;
+
         handleSend(selectedFile);
 
         setSelectedFile(null);
         setWarning("");
+        setShowAttachMenu(false);
 
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
 
+    const handleVoice = () => {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            setWarning("Voice input is not supported in this browser.");
+            return;
+        }
+
+        if (isListening) return;
+
+        const getCurrentLanguage = () => {
+            const lang = i18n.language || "en";
+
+            if (lang.startsWith("zh")) return "zh";
+            if (lang.startsWith("ms")) return "ms";
+            if (lang.startsWith("ta")) return "ta";
+
+            return "en";
+        };
+
+        const langMap = {
+            en: "en-SG",
+            ms: "ms-MY",
+            zh: "zh-CN",
+            ta: "ta-IN",
+        };
+
+        const currentLang = getCurrentLanguage();
+        const recognitionLang = langMap[currentLang] || "en-SG";
+
+        const recognition = new SpeechRecognition();
+
+        recognition.lang = recognitionLang;
+        recognition.interimResults = false;
+        recognition.continuous = false;
+
+        console.log("Current i18n language:", i18n.language);
+        console.log("Speech recognition language:", recognition.lang);
+
+        recognition.onstart = () => {
+            setWarning("");
+            setIsListening(true);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+
+            setInputText((prev) => {
+                const currentText = prev.trim();
+
+                if (!currentText) {
+                    return transcript;
+                }
+
+                return `${currentText} ${transcript}`;
+            });
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            setIsListening(false);
+            setWarning("Voice input failed. Please try again.");
+        };
+
+        recognition.start();
+    };
+
     return (
         <footer className="input-footer">
             <div className="input-container">
-
                 {warning && (
                     <div className="input-warning">
                         {warning}
@@ -113,6 +191,7 @@ export default function InputBar({
                             className="file-preview-remove"
                             onClick={removeFile}
                             type="button"
+                            aria-label="Remove selected file"
                         >
                             ×
                         </button>
@@ -124,7 +203,9 @@ export default function InputBar({
                         <button
                             className="input-icon-btn"
                             type="button"
-                            onClick={() => setShowAttachMenu(!showAttachMenu)}
+                            onClick={() => setShowAttachMenu((prev) => !prev)}
+                            disabled={isLoading}
+                            aria-label="Attach file"
                         >
                             <svg
                                 className="rotate-icon"
@@ -146,7 +227,7 @@ export default function InputBar({
                                 <button
                                     className="attach-option"
                                     type="button"
-                                    onClick={() => fileInputRef.current.click()}
+                                    onClick={() => fileInputRef.current?.click()}
                                 >
                                     <div className="attach-option-icon">📎</div>
 
@@ -172,15 +253,24 @@ export default function InputBar({
                         placeholder={t("chat.askPlaceholder")}
                         className="chat-input"
                         value={inputText}
+                        disabled={isLoading}
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
                                 onSend();
                             }
                         }}
                     />
 
-                    <button className="input-icon-btn" type="button">
+                    <button
+                        className={`input-icon-btn ${isListening ? "listening" : ""}`}
+                        type="button"
+                        onClick={handleVoice}
+                        disabled={isLoading}
+                        aria-label="Use voice input"
+                        title={isListening ? "Listening..." : "Use voice input"}
+                    >
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 strokeLinecap="round"
@@ -196,6 +286,7 @@ export default function InputBar({
                         type="button"
                         onClick={onSend}
                         disabled={isLoading}
+                        aria-label="Send message"
                     >
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path

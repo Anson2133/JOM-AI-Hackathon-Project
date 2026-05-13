@@ -1059,3 +1059,47 @@ svg {
   background: #b71c1c;
   transform: translateY(-1px);
 }
+
+.speak-btn-wrapper {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.speak-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #667085;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.speak-btn:hover {
+  background: #f9fafb;
+  color: #B81C1D;
+  border-color: #f3c7ca;
+}
+
+.speak-btn.speaking {
+  background: #FCEBEC;
+  color: #B81C1D;
+  border-color: #f3c7ca;
+}
+
+.input-icon-btn.listening {
+  color: #B81C1D;
+  background: #FCEBEC;
+  border-radius: 999px;
+}
+
+.input-icon-btn:disabled,
+.send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
