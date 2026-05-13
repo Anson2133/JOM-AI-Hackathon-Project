@@ -309,12 +309,6 @@ export default function ChatArea({
                   </div>
                 )}
 
-                {!isUser && msg.content && (
-                  <div className="speak-btn-wrapper">
-                    <SpeakButton text={cleanedContent} />
-                  </div>
-                )}
-
                 {!isUser && msg.relatedServices?.length > 0 && (
                   <div className="chat-service-actions">
                     {msg.relatedServices.map((service) => (
