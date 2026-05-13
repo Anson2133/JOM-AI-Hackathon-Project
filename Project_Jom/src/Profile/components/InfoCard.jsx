@@ -1,7 +1,10 @@
-function InfoCard({ title, rows = [] }) {
+function InfoCard({ title, rows = [], icon }) {
   return (
     <section className="info-card">
-      <h2>{title}</h2>
+      <div className="info-card-header">
+        {icon && <div className="info-card-icon">{icon}</div>}
+        <h2>{title}</h2>
+      </div>
 
       <div className="info-card-rows">
         {rows.map((row) => (
