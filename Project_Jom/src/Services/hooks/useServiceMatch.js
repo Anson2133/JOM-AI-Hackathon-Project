@@ -48,7 +48,11 @@ export default function useServiceMatch() {
     }
   };
 
-  const checkEligibility = async ({ serviceId, selectedNeedId, answers }) => {
+  const checkEligibility = async ({
+    serviceId,
+    selectedNeedId,
+    answers,
+  }) => {
     try {
       setLoading(true);
       setError("");
@@ -72,7 +76,9 @@ export default function useServiceMatch() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to recheck eligibility");
+        throw new Error(
+          data.message || "Failed to recheck eligibility"
+        );
       }
 
       return data;
@@ -85,6 +91,47 @@ export default function useServiceMatch() {
     }
   };
 
+  const generateQuestions = async ({
+    serviceId,
+    selectedNeedId,
+  }) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const userId = localStorage.getItem("userId");
+
+      const res = await fetch(MATCH_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "generateQuestions",
+          userId,
+          serviceId,
+          selectedNeedId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to generate questions"
+        );
+      }
+
+      return data.extraQuestions || [];
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     matches,
     profileUsed,
@@ -92,5 +139,6 @@ export default function useServiceMatch() {
     error,
     matchServices,
     checkEligibility,
+    generateQuestions,
   };
 }

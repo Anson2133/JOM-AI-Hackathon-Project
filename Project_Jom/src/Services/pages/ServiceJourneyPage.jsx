@@ -32,6 +32,8 @@ function ServiceJourneyPage() {
   const [pdfEmail, setPdfEmail] = useState("");
   const [matchProgress, setMatchProgress] = useState(0);
   const [autoCheckedServiceId, setAutoCheckedServiceId] = useState(null);
+  const [dynamicExtraQuestions, setDynamicExtraQuestions] = useState([]);
+  const [questionsGeneratedServiceId, setQuestionsGeneratedServiceId] = useState(null);
 
   const cachedProfile = JSON.parse(
     localStorage.getItem("cachedProfile") || "{}"
@@ -54,6 +56,7 @@ function ServiceJourneyPage() {
     error: matchingError,
     matchServices,
     checkEligibility,
+    generateQuestions,
   } = useServiceMatch();
 
   const {
@@ -89,7 +92,10 @@ function ServiceJourneyPage() {
 
     setSelectedService(exactService);
     setEligibilityResult(null);
+    setEligibilityAnswers({});
     setAutoCheckedServiceId(null);
+    setDynamicExtraQuestions([]);
+    setQuestionsGeneratedServiceId(null);
     setCurrentStep(4);
   }, [serviceIdFromUrl, loading, services, selectedService]);
 
@@ -129,6 +135,48 @@ function ServiceJourneyPage() {
   ]);
 
   useEffect(() => {
+    if (currentStep !== 4) return;
+    if (!selectedService?.serviceId) return;
+    if (!(fromSearch || fromChat)) return;
+    if (questionsGeneratedServiceId === selectedService.serviceId) return;
+    if (matchingLoading) return;
+
+    let cancelled = false;
+
+    const runAiQuestionGeneration = async () => {
+      setQuestionsGeneratedServiceId(selectedService.serviceId);
+
+      const questions = await generateQuestions({
+        serviceId: selectedService.serviceId,
+        selectedNeedId: selectedNeed?.id,
+      });
+
+      if (!cancelled && Array.isArray(questions) && questions.length > 0) {
+        setDynamicExtraQuestions(questions);
+        setEligibilityAnswers({});
+        setEligibilityResult(null);
+        resetServiceGuide();
+      }
+    };
+
+    runAiQuestionGeneration();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentStep,
+    selectedService?.serviceId,
+    selectedNeed?.id,
+    fromSearch,
+    fromChat,
+    questionsGeneratedServiceId,
+    matchingLoading,
+    generateQuestions,
+    resetServiceGuide,
+  ]);
+
+  useEffect(() => {
     if (currentStep !== 5) return;
     if (!selectedService) return;
     if (serviceGuide) return;
@@ -160,7 +208,10 @@ function ServiceJourneyPage() {
     setEligibilityResult(null);
   };
 
-  const extraQuestions = selectedService?.extraQuestions || [];
+  const extraQuestions =
+    dynamicExtraQuestions.length > 0
+      ? dynamicExtraQuestions
+      : selectedService?.extraQuestions || [];
 
   const getQuestionKey = (question, index) =>
     typeof question === "string"
@@ -348,6 +399,8 @@ function ServiceJourneyPage() {
                     setEligibilityAnswers({});
                     setEligibilityResult(null);
                     setAutoCheckedServiceId(null);
+                    setDynamicExtraQuestions([]);
+                    setQuestionsGeneratedServiceId(null);
                     resetServiceGuide();
                     setCurrentStep(4);
                   }}
