@@ -8,6 +8,7 @@ import ServicesPage from "./Services/pages/ServicesPage";
 import ServiceJourneyPage from "./Services/pages/ServiceJourneyPage";
 import DocumentScannerPage from "./Document Scanner/pages/DocumentScannerPage";
 import MobileDocumentUploadPage from "./Document Scanner/pages/MobileDocumentUploadPage";
+import HelpPage from "./Help/pages/HelpPage";
 function App() {
   return (
     <Routes>
@@ -26,6 +27,7 @@ function App() {
         />
         <Route path="/document-scanner" element={<DocumentScannerPage />} />
         <Route path="/mobile-document-upload/:scanSessionId" element={<MobileDocumentUploadPage />} />
+        <Route path="/help" element={<HelpPage />} />
 
       </Route>
 
