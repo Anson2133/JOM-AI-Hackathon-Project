@@ -1537,3 +1537,41 @@
     background: #f9fafb;
     border: 1px solid #e4e7ec;
 }
+
+.eligibility-note-panel {
+    margin-top: 24px;
+    padding: 20px 22px;
+    border-radius: 18px;
+    background: #f8fafc;
+    border: 1px solid #e4e7ec;
+}
+
+.eligibility-note-panel.warning {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.eligibility-note-panel h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    color: #101828;
+}
+
+.eligibility-note-panel.warning h2 {
+    color: #9a3412;
+}
+
+.eligibility-note-panel ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #475467;
+    line-height: 1.65;
+}
+
+.eligibility-note-panel.warning ul {
+    color: #9a3412;
+}
+
+.eligibility-note-panel li+li {
+    margin-top: 6px;
+}

@@ -3,6 +3,14 @@ import { useState } from "react";
 const MATCH_API =
   "https://9pidtz8z27.execute-api.us-east-1.amazonaws.com/services/match";
 
+const DEBUG_SERVICE_MATCH = true;
+
+function debugLog(label, data) {
+  if (DEBUG_SERVICE_MATCH) {
+    console.log(`[ServiceMatch] ${label}`, data);
+  }
+}
+
 export default function useServiceMatch() {
   const [matches, setMatches] = useState([]);
   const [profileUsed, setProfileUsed] = useState(null);
@@ -16,19 +24,26 @@ export default function useServiceMatch() {
 
       const userId = localStorage.getItem("userId");
 
+      const payload = {
+        userId,
+        categoryId,
+        selectedNeedId,
+        debug: DEBUG_SERVICE_MATCH,
+      };
+
+      debugLog("matchServices payload", payload);
+
       const res = await fetch(MATCH_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-          categoryId,
-          selectedNeedId,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
+
+      debugLog("matchServices response", data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to match services");
@@ -48,37 +63,38 @@ export default function useServiceMatch() {
     }
   };
 
-  const checkEligibility = async ({
-    serviceId,
-    selectedNeedId,
-    answers,
-  }) => {
+  const checkEligibility = async ({ serviceId, selectedNeedId, answers }) => {
     try {
       setLoading(true);
       setError("");
 
       const userId = localStorage.getItem("userId");
 
+      const payload = {
+        action: "checkEligibility",
+        userId,
+        serviceId,
+        selectedNeedId,
+        answers,
+        debug: DEBUG_SERVICE_MATCH,
+      };
+
+      debugLog("checkEligibility payload", payload);
+
       const res = await fetch(MATCH_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          action: "checkEligibility",
-          userId,
-          serviceId,
-          selectedNeedId,
-          answers,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
+      debugLog("checkEligibility response", data);
+
       if (!res.ok) {
-        throw new Error(
-          data.message || "Failed to recheck eligibility"
-        );
+        throw new Error(data.message || "Failed to recheck eligibility");
       }
 
       return data;
@@ -91,35 +107,37 @@ export default function useServiceMatch() {
     }
   };
 
-  const generateQuestions = async ({
-    serviceId,
-    selectedNeedId,
-  }) => {
+  const generateQuestions = async ({ serviceId, selectedNeedId }) => {
     try {
       setLoading(true);
       setError("");
 
       const userId = localStorage.getItem("userId");
 
+      const payload = {
+        action: "generateQuestions",
+        userId,
+        serviceId,
+        selectedNeedId,
+        debug: DEBUG_SERVICE_MATCH,
+      };
+
+      debugLog("generateQuestions payload", payload);
+
       const res = await fetch(MATCH_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          action: "generateQuestions",
-          userId,
-          serviceId,
-          selectedNeedId,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
+      debugLog("generateQuestions response", data);
+
       if (!res.ok) {
-        throw new Error(
-          data.message || "Failed to generate questions"
-        );
+        throw new Error(data.message || "Failed to generate questions");
       }
 
       return data.extraQuestions || [];

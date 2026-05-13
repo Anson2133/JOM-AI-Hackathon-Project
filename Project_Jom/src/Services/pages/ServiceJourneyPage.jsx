@@ -234,6 +234,22 @@ function ServiceJourneyPage() {
         ? "Ready to recheck eligibility"
         : "Needs more information";
 
+  const currentMissingInfo =
+    eligibilityResult?.missingInfo || selectedService?.missingInfo || [];
+
+  const usefulEligibilityReasons = (
+    eligibilityResult?.reasons ||
+    selectedService?.reasons ||
+    []
+  ).filter((reason) => {
+    const text = String(reason || "").toLowerCase();
+
+    return (
+      reason &&
+      !text.includes("this service is in your selected category")
+    );
+  });
+
   const startMatchProgress = () => {
     setMatchProgress(10);
 
@@ -449,18 +465,16 @@ function ServiceJourneyPage() {
             )}
           </div>
 
-          {(selectedService.missingInfo || []).length > 0 && (
-            <>
+          {currentMissingInfo.length > 0 && (
+            <div className="eligibility-note-panel warning">
               <h2>Things to Confirm</h2>
 
-              <div className="guidance-list">
-                {selectedService.missingInfo.map((info, index) => (
-                  <div key={index} className="guidance-list-item">
-                    {info}
-                  </div>
+              <ul>
+                {currentMissingInfo.map((info, index) => (
+                  <li key={index}>{info}</li>
                 ))}
-              </div>
-            </>
+              </ul>
+            </div>
           )}
 
           {extraQuestions.length > 0 ? (
@@ -530,13 +544,15 @@ function ServiceJourneyPage() {
             <p>No additional questions required for this service.</p>
           )}
 
-          {eligibilityResult && (
-            <div className="guidance-list">
-              {(eligibilityResult.reasons || []).map((reason, index) => (
-                <div key={index} className="guidance-list-item">
-                  {reason}
-                </div>
-              ))}
+          {eligibilityResult && usefulEligibilityReasons.length > 0 && (
+            <div className="eligibility-note-panel">
+              <h2>Why this estimate?</h2>
+
+              <ul>
+                {usefulEligibilityReasons.slice(0, 4).map((reason, index) => (
+                  <li key={index}>{reason}</li>
+                ))}
+              </ul>
             </div>
           )}
 

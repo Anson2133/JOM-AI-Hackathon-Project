@@ -37,6 +37,18 @@ export const serviceCategories = [
         description: "School, student, and learning support schemes.",
         icon: GraduationCap,
     },
+    {
+        id: "family-parenting-support",
+        title: "Family & Parenting Support",
+        description: "Parenting, child, family, and household support services.",
+        icon: UsersRound,
+    },
+    {
+        id: "childcare-education-support",
+        title: "Childcare & Education Support",
+        description: "Preschool, student, school, childcare, and learning support.",
+        icon: GraduationCap,
+    },
 ];
 
 export const supportNeeds = {
@@ -132,6 +144,31 @@ export const supportNeeds = {
             id: "early-childhood-support",
             title: "Early Childhood Support",
             description: "Support for preschool children and young families.",
+        },
+    ],
+    "family-parenting-support": [
+        {
+            id: "parenting-support",
+            title: "Parenting Support",
+            description: "Support for parents, caregivers, and families with children.",
+        },
+        {
+            id: "family-child-support",
+            title: "Family or Child Support",
+            description: "Help for families with dependants or child-related needs.",
+        },
+    ],
+
+    "childcare-education-support": [
+        {
+            id: "student-financial-support",
+            title: "Student Financial Support",
+            description: "School transport, bursaries, and learning support.",
+        },
+        {
+            id: "early-childhood-support",
+            title: "Early Childhood Support",
+            description: "Childcare, preschool, infant, and young child support.",
         },
     ],
 };
