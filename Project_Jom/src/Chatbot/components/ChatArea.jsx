@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 function cleanBotText(text) {
   if (!text) return "";
@@ -15,33 +15,83 @@ function formatMessageWithLinks(text) {
   const urlRegex =
     /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(sg|com|org|net)[^\s]*)/g;
 
-  return text.split("\n").map((line, lineIndex) => (
+  const processedText = text
+    .replace(/\/booking/g, "%%BOOKING%%")
+    .replace(/https?:\/\/activesg\.gov\.sg[^\s]*/g, "%%ACTIVESG%%")
+    .replace(/activesg\.gov\.sg[^\s]*/g, "%%ACTIVESG%%")
+    .replace(/https?:\/\/www\.tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(/www\.tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(/tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(
+      /(?:https?:\/\/)?onepa\.gov\.sg\/facilities\/availability\?facilityId=([A-Za-z0-9_]+)/g,
+      (_, id) => `%%ONEPA::${id}%%`
+    )
+    .replace(/(?:https?:\/\/)?(?:www\.)?onepa\.gov\.sg[^\s]*/g, "%%ONEPA_GENERIC%%");
+
+  const placeholderRegex = /(%%[^%]+%%)/g;
+
+  return processedText.split("\n").map((line, lineIndex) => (
     <span key={lineIndex}>
-      {line.split(urlRegex).map((part, index) => {
+      {line.split(placeholderRegex).map((part, index) => {
         if (!part) return null;
 
-        const isUrl = part.match(urlRegex);
+        if (part === "%%BOOKING%%") {
+          return (
+            <Link key={index} to="/booking" className="chat-link">
+              Facilities &amp; Booking page
+            </Link>
+          );
+        }
 
-        if (!isUrl) return part;
+        if (part === "%%ACTIVESG%%") {
+          return (
+            <a key={index} href="https://activesg.gov.sg/facility-bookings/activities" target="_blank" rel="noopener noreferrer" className="chat-link">
+              ActiveSG Facility Bookings
+            </a>
+          );
+        }
 
-        const href =
-          part.startsWith("http://") || part.startsWith("https://")
-            ? part
-            : `https://${part}`;
+        if (part === "%%TAMPINES%%") {
+          return (
+            <a key={index} href="https://www.tampines.org.sg/ResidentServices/BulkyItemRemovalServices" target="_blank" rel="noopener noreferrer" className="chat-link">
+              Tampines Town Council
+            </a>
+          );
+        }
 
-        return (
-          <a
-            key={index}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="chat-link"
-          >
-            {part}
-          </a>
-        );
+        if (part.startsWith("%%ONEPA::")) {
+          const id = part.replace("%%ONEPA::", "").replace("%%", "");
+          const url = `https://onepa.gov.sg/facilities/availability?facilityId=${id}`;
+          return (
+            <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="chat-link">
+              Book here
+            </a>
+          );
+        }
+
+        if (part === "%%ONEPA_GENERIC%%") {
+          return (
+            <a key={index} href="https://www.onepa.gov.sg/facilities" target="_blank" rel="noopener noreferrer" className="chat-link">
+              OnePA Facilities
+            </a>
+          );
+        }
+
+        return part.split(urlRegex).map((chunk, i) => {
+          if (!chunk) return null;
+          const isUrl = chunk.match(urlRegex);
+          if (!isUrl) return chunk;
+          const href = chunk.startsWith("http://") || chunk.startsWith("https://")
+            ? chunk
+            : `https://${chunk}`;
+          return (
+            <a key={`${index}-${i}`} href={href} target="_blank" rel="noopener noreferrer" className="chat-link">
+              {chunk}
+            </a>
+          );
+        });
       })}
-      {lineIndex < text.split("\n").length - 1 && <br />}
+      {lineIndex < processedText.split("\n").length - 1 && <br />}
     </span>
   ));
 }
@@ -56,7 +106,6 @@ function FileCard({ attachment }) {
       <div className={`sent-file-icon ${isPdf ? "pdf-file" : "image-file"}`}>
         {isPdf ? "PDF" : "IMG"}
       </div>
-
       <div className="sent-file-info">
         <p>{attachment.name}</p>
         <span>{attachment.type}</span>
@@ -71,11 +120,9 @@ function SpeakButton({ text }) {
 
   const getCurrentLanguage = () => {
     const lang = i18n.language || "en";
-
     if (lang.startsWith("zh")) return "zh";
     if (lang.startsWith("ms")) return "ms";
     if (lang.startsWith("ta")) return "ta";
-
     return "en";
   };
 
@@ -91,67 +138,28 @@ function SpeakButton({ text }) {
     const targetLang = langMap[languageKey] || "en-SG";
     const shortLang = targetLang.split("-")[0];
 
-    console.log("Current i18n language:", i18n.language);
-    console.log("Selected speech language:", targetLang);
-    console.log(
-      "Available voices:",
-      voices.map((voice) => ({
-        name: voice.name,
-        lang: voice.lang,
-      }))
-    );
-
     const preferredVoiceNames = {
-      en: [
-        "Microsoft Natasha",
-        "Microsoft Sonia",
-        "Microsoft Aria",
-        "Google UK English Female",
-        "Google US English",
-        "Samantha",
-        "Daniel",
-      ],
-      zh: [
-        "Microsoft Xiaoxiao",
-        "Microsoft Huihui",
-        "Microsoft Yaoyao",
-        "Google 普通话",
-        "Google Mandarin",
-        "Ting-Ting",
-        "Sin-ji",
-      ],
-      ms: [
-        "Microsoft Yasmin",
-        "Google Bahasa Melayu",
-        "Google Malay",
-      ],
-      ta: [
-        "Microsoft Valluvar",
-        "Google தமிழ்",
-        "Google Tamil",
-      ],
+      en: ["Microsoft Natasha", "Microsoft Sonia", "Microsoft Aria", "Google UK English Female", "Google US English", "Samantha", "Daniel"],
+      zh: ["Microsoft Xiaoxiao", "Microsoft Huihui", "Microsoft Yaoyao", "Google 普通话", "Google Mandarin", "Ting-Ting", "Sin-ji"],
+      ms: ["Microsoft Yasmin", "Google Bahasa Melayu", "Google Malay"],
+      ta: ["Microsoft Valluvar", "Google தமிழ்", "Google Tamil"],
     };
 
     const preferredList = preferredVoiceNames[languageKey] || preferredVoiceNames.en;
 
     const preferredVoice = voices.find((voice) =>
-      preferredList.some((name) =>
-        voice.name.toLowerCase().includes(name.toLowerCase())
-      )
+      preferredList.some((name) => voice.name.toLowerCase().includes(name.toLowerCase()))
     );
-
     if (preferredVoice) return preferredVoice;
 
     const exactLangVoice = voices.find(
       (voice) => voice.lang.toLowerCase() === targetLang.toLowerCase()
     );
-
     if (exactLangVoice) return exactLangVoice;
 
     const sameLanguageVoice = voices.find((voice) =>
       voice.lang.toLowerCase().startsWith(shortLang.toLowerCase())
     );
-
     if (sameLanguageVoice) return sameLanguageVoice;
 
     return null;
@@ -175,7 +183,6 @@ function SpeakButton({ text }) {
     utterance.lang = speechLang;
 
     const selectedVoice = pickBestVoice(languageKey);
-
     if (selectedVoice) {
       utterance.voice = selectedVoice;
     } else {
@@ -202,46 +209,14 @@ function SpeakButton({ text }) {
       aria-label={isSpeaking ? "Stop reading message" : "Read message aloud"}
     >
       {isSpeaking ? (
-        <svg
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 10h6v4H9z"
-          />
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 10h6v4H9z" />
         </svg>
       ) : (
-        <svg
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15.536 8.464a5 5 0 010 7.072"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M11 5L6 9H2v6h4l5 4V5z"
-          />
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5L6 9H2v6h4l5 4V5z" />
         </svg>
       )}
     </button>
@@ -257,21 +232,19 @@ export default function ChatArea({
 }) {
   const messagesEndRef = useRef(null);
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (window.speechSynthesis) {
       window.speechSynthesis.getVoices();
-
       window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.getVoices();
       };
     }
   }, []);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
   return (
@@ -281,7 +254,6 @@ export default function ChatArea({
           <p className="chat-eyebrow">{t("chat.currentConversation")}</p>
           <h2 className="chat-title">{chatTitle}</h2>
         </div>
-
         <div className="chat-header-pill">{t("chat.personalisedSupport")}</div>
       </div>
 
@@ -291,11 +263,7 @@ export default function ChatArea({
           const cleanedContent = cleanBotText(msg.content);
 
           return (
-            <div
-              key={index}
-              className={`message-wrapper ${isUser ? "user-message" : "ai-message"
-                }`}
-            >
+            <div key={index} className={`message-wrapper ${isUser ? "user-message" : "ai-message"}`}>
               {!isUser && <div className="avatar ai-avatar">{aiInitials}</div>}
 
               <div className={`bubble ${isUser ? "user-bubble" : "ai-bubble"}`}>
@@ -337,9 +305,7 @@ export default function ChatArea({
                 )}
               </div>
 
-              {isUser && (
-                <div className="avatar user-avatar">{userInitials}</div>
-              )}
+              {isUser && <div className="avatar user-avatar">{userInitials}</div>}
             </div>
           );
         })}
@@ -347,7 +313,6 @@ export default function ChatArea({
         {isLoading && (
           <div className="message-wrapper ai-message">
             <div className="avatar ai-avatar">{aiInitials}</div>
-
             <div className="bubble ai-bubble">
               <div className="typing-indicator">
                 <span></span>
