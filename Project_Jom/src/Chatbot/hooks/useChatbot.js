@@ -13,20 +13,63 @@ const TITLE_API_URL =
 export default function useChatbot({ name, userId }) {
     const { i18n } = useTranslation();
 
-    const welcomeMessages = {
-        en: `Good morning ${name}. How can I help you today?`,
-        ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
-        zh: `早上好 ${name}。今天我能为您做什么？`,
-        ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`
+    const getCurrentLanguage = () => {
+        const lang = i18n.language || "en";
+
+        if (lang.startsWith("ms")) return "ms";
+        if (lang.startsWith("zh")) return "zh";
+        if (lang.startsWith("ta")) return "ta";
+
+        return "en";
+    };
+
+    const getWelcomeText = () => {
+        const currentLang = getCurrentLanguage();
+
+        const welcomeMessages = {
+            en: `Good morning ${name}. How can I help you today?`,
+            ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
+            zh: `早上好 ${name}。今天我能为您做什么？`,
+            ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`,
+        };
+
+        return welcomeMessages[currentLang] || welcomeMessages.en;
     };
 
     const createWelcomeMessage = () => [
         {
             role: "ai",
             type: "text",
-            content: welcomeMessages[i18n.language] || welcomeMessages.en,
+            content: getWelcomeText(),
         },
     ];
+
+    const createDocumentContextMessage = (context) => {
+        const serviceName =
+            context?.relatedService?.serviceName ||
+            context?.mainTopic ||
+            "the scanned document";
+
+        const riskLevel = context?.scamRisk?.level || "Unknown";
+
+        return [
+            {
+                role: "ai",
+                type: "text",
+                content:
+                    `I see you scanned a document about ${serviceName}.\n\n` +
+                    `Summary: ${context?.summary || "No summary available."}\n\n` +
+                    `Scam risk: ${riskLevel}\n\n` +
+                    `Recommended next step: ${context?.recommendedNextStep || "Verify through official channels before proceeding."}\n\n` +
+                    `You can ask me things like:\n` +
+                    `1. Is this message safe?\n` +
+                    `2. What does this document mean?\n` +
+                    `3. How do I apply for this service?\n` +
+                    `4. What should I do next?`,
+                documentContext: context,
+            },
+        ];
+    };
 
     const [inputText, setInputText] = useState("");
     const [chatTitle, setChatTitle] = useState("New Chat");
@@ -55,26 +98,68 @@ export default function useChatbot({ name, userId }) {
     }, [userId]);
 
     useEffect(() => {
-        const welcomeMessages = {
-            en: `Good morning ${name}. How can I help you today?`,
-            ms: `Selamat pagi ${name}. Bagaimana saya boleh membantu anda hari ini?`,
-            zh: `早上好 ${name}。今天我能为您做什么？`,
-            ta: `காலை வணக்கம் ${name}. இன்று நான் உங்களுக்கு எப்படி உதவலாம்?`
-        };
-
         setMessages((prev) => {
-            if (prev.length === 0 || prev[0].role !== "ai") return prev;
+            if (prev.length === 0) return prev;
+
+            const firstMessage = prev[0];
+
+            const isWelcomeMessage =
+                firstMessage.role === "ai" &&
+                !firstMessage.documentContext &&
+                (
+                    firstMessage.content?.includes("Good morning") ||
+                    firstMessage.content?.includes("Selamat pagi") ||
+                    firstMessage.content?.includes("早上好") ||
+                    firstMessage.content?.includes("காலை வணக்கம்")
+                );
+
+            if (!isWelcomeMessage) return prev;
 
             return [
                 {
-                    role: "ai",
-                    type: "text",
-                    content: welcomeMessages[i18n.language] || welcomeMessages.en,
+                    ...firstMessage,
+                    content: getWelcomeText(),
                 },
                 ...prev.slice(1),
             ];
         });
     }, [i18n.language, name]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const rawContext = params.get("documentContext");
+
+        if (!rawContext) return;
+
+        try {
+            const context = JSON.parse(decodeURIComponent(rawContext));
+            const conversationId = `document-chat-${Date.now()}`;
+
+            const documentMessages = createDocumentContextMessage(context);
+
+            const newConversation = {
+                userId,
+                conversationId,
+                title: `Document: ${context.mainTopic || "Scanned Document"}`,
+                date: new Date().toISOString(),
+                messages: documentMessages,
+            };
+
+            setChatTitle(newConversation.title);
+            setMessages(documentMessages);
+            setCurrentConversationId(conversationId);
+            setInputText("");
+            setConversations((prev) => [newConversation, ...prev]);
+
+            if (userId) {
+                saveConversationToDB(newConversation);
+            }
+
+            window.history.replaceState({}, "", "/chat");
+        } catch (error) {
+            console.error("Failed to load document context:", error);
+        }
+    }, [userId]);
 
     const saveConversationToDB = async (conversation) => {
         try {
@@ -179,6 +264,22 @@ export default function useChatbot({ name, userId }) {
         setInputText("");
         setIsLoading(true);
 
+        const latestDocumentContext = messages.find(
+            (message) => message.documentContext
+        )?.documentContext;
+
+        const finalUserPrompt = latestDocumentContext
+            ? `
+The user is asking about a scanned document.
+
+Document context:
+${JSON.stringify(latestDocumentContext, null, 2)}
+
+User question:
+${trimmedInput || "Please help me understand this document."}
+`
+            : trimmedInput || "Please analyse this uploaded file.";
+
         try {
             const response = await fetch(CHATBOT_API_URL, {
                 method: "POST",
@@ -186,10 +287,10 @@ export default function useChatbot({ name, userId }) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    message: trimmedInput || "Please analyse this uploaded file.",
+                    message: finalUserPrompt,
                     file: attachment?.base64 || undefined,
                     fileType: attachment?.type || undefined,
-                    language: i18n.language,
+                    language: getCurrentLanguage(),
                 }),
             });
 
@@ -203,6 +304,7 @@ export default function useChatbot({ name, userId }) {
                 role: "ai",
                 type: "text",
                 content: data?.response || "Sorry, I could not get a response.",
+                relatedServices: data?.relatedServices || [],
             };
 
             const finalMessages = [...messagesWithUser, aiMessage];
@@ -226,6 +328,7 @@ export default function useChatbot({ name, userId }) {
                 type: "text",
                 content:
                     "Sorry, I could not connect to the chatbot right now. Please try again later.",
+                relatedServices: [],
             };
 
             const finalMessages = [...messagesWithUser, errorMessage];
@@ -248,6 +351,7 @@ export default function useChatbot({ name, userId }) {
 
     const handleNewChat = () => {
         const newConversation = {
+            userId,
             conversationId: `draft-${Date.now()}`,
             title: "New Chat",
             date: new Date().toISOString(),
@@ -264,9 +368,9 @@ export default function useChatbot({ name, userId }) {
     };
 
     const handleSelectConversation = (conversation) => {
-        setChatTitle(conversation.title);
+        setChatTitle(conversation.title || "New Chat");
         setMessages(conversation.messages || createWelcomeMessage());
-        setCurrentConversationId(conversation.conversationId);
+        setCurrentConversationId(conversation.conversationId || conversation.id);
     };
 
     return {

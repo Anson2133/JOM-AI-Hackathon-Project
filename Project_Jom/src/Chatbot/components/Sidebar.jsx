@@ -50,7 +50,6 @@ function formatConversationDate(dateString) {
 
 export default function Sidebar({
   conversations = [],
-  currentChatTitle,
   currentConversationId,
   onNewChat,
   onSelectConversation,
@@ -59,15 +58,18 @@ export default function Sidebar({
   const { t } = useTranslation();
 
   const filteredConversations = useMemo(() => {
-    const search = searchText.toLowerCase();
+    const search = searchText.trim().toLowerCase();
 
     return [...conversations]
       .sort((a, b) => {
         const dateA = new Date(getConversationTime(a)).getTime() || 0;
         const dateB = new Date(getConversationTime(b)).getTime() || 0;
+
         return dateB - dateA;
       })
       .filter((conversation) => {
+        if (!search) return true;
+
         const title = conversation.title || t("chat.newChat");
         const date = formatConversationDate(getConversationTime(conversation));
 
@@ -81,7 +83,11 @@ export default function Sidebar({
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
-        <button className="new-chat-btn" onClick={onNewChat}>
+        <button
+          className="new-chat-btn"
+          type="button"
+          onClick={onNewChat}
+        >
           <span className="plus-icon">+</span>
           {t("chat.newChat")}
         </button>
@@ -106,13 +112,16 @@ export default function Sidebar({
               </p>
             ) : (
               filteredConversations.map((conversation) => {
-                const isActive =
-                  conversation.conversationId === currentConversationId;
+                const conversationId =
+                  conversation.conversationId || conversation.id;
+
+                const isActive = conversationId === currentConversationId;
 
                 return (
                   <button
-                    key={conversation.conversationId || conversation.id}
+                    key={conversationId}
                     className={`history-item ${isActive ? "active" : ""}`}
+                    type="button"
                     onClick={() => onSelectConversation(conversation)}
                   >
                     <span className="history-item-title">

@@ -1037,43 +1037,69 @@ svg {
   color: #d1d5db;
 }
 
-.listening {
-  color: #B81C1D !important;
-  animation: pulse 1s infinite;
+.chat-service-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+.chat-service-button {
+  border: none;
+  background: #d32f2f;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.chat-service-button:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
 }
 
 .speak-btn-wrapper {
-  margin-top: 8px;
+  margin-top: 12px;
   display: flex;
   justify-content: flex-end;
 }
 
 .speak-btn {
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 4px 8px;
-  cursor: pointer;
-  color: #9ca3af;
+  background: #ffffff;
+  color: #667085;
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  transition: all 0.2s;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .speak-btn:hover {
+  background: #f9fafb;
   color: #B81C1D;
-  border-color: #B81C1D;
+  border-color: #f3c7ca;
 }
 
 .speak-btn.speaking {
+  background: #FCEBEC;
   color: #B81C1D;
-  border-color: #B81C1D;
-  animation: pulse 1s infinite;
+  border-color: #f3c7ca;
+}
+
+.input-icon-btn.listening {
+  color: #B81C1D;
+  background: #FCEBEC;
+  border-radius: 999px;
+}
+
+.input-icon-btn:disabled,
+.send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
