@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 function cleanBotText(text) {
   if (!text) return "";
@@ -14,33 +15,83 @@ function formatMessageWithLinks(text) {
   const urlRegex =
     /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(sg|com|org|net)[^\s]*)/g;
 
-  return text.split("\n").map((line, lineIndex) => (
+  const processedText = text
+    .replace(/\/booking/g, "%%BOOKING%%")
+    .replace(/https?:\/\/activesg\.gov\.sg[^\s]*/g, "%%ACTIVESG%%")
+    .replace(/activesg\.gov\.sg[^\s]*/g, "%%ACTIVESG%%")
+    .replace(/https?:\/\/www\.tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(/www\.tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(/tampines\.org\.sg[^\s]*/g, "%%TAMPINES%%")
+    .replace(
+      /(?:https?:\/\/)?onepa\.gov\.sg\/facilities\/availability\?facilityId=([A-Za-z0-9_]+)/g,
+      (_, id) => `%%ONEPA::${id}%%`
+    )
+    .replace(/(?:https?:\/\/)?(?:www\.)?onepa\.gov\.sg[^\s]*/g, "%%ONEPA_GENERIC%%");
+
+  const placeholderRegex = /(%%[^%]+%%)/g;
+
+  return processedText.split("\n").map((line, lineIndex) => (
     <span key={lineIndex}>
-      {line.split(urlRegex).map((part, index) => {
+      {line.split(placeholderRegex).map((part, index) => {
         if (!part) return null;
 
-        const isUrl = part.match(urlRegex);
+        if (part === "%%BOOKING%%") {
+          return (
+            <Link key={index} to="/booking" className="chat-link">
+              Facilities &amp; Booking page
+            </Link>
+          );
+        }
 
-        if (!isUrl) return part;
+        if (part === "%%ACTIVESG%%") {
+          return (
+            <a key={index} href="https://activesg.gov.sg/facility-bookings/activities" target="_blank" rel="noopener noreferrer" className="chat-link">
+              ActiveSG Facility Bookings
+            </a>
+          );
+        }
 
-        const href =
-          part.startsWith("http://") || part.startsWith("https://")
-            ? part
-            : `https://${part}`;
+        if (part === "%%TAMPINES%%") {
+          return (
+            <a key={index} href="https://www.tampines.org.sg/ResidentServices/BulkyItemRemovalServices" target="_blank" rel="noopener noreferrer" className="chat-link">
+              Tampines Town Council
+            </a>
+          );
+        }
 
-        return (
-          <a
-            key={index}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="chat-link"
-          >
-            {part}
-          </a>
-        );
+        if (part.startsWith("%%ONEPA::")) {
+          const id = part.replace("%%ONEPA::", "").replace("%%", "");
+          const url = `https://onepa.gov.sg/facilities/availability?facilityId=${id}`;
+          return (
+            <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="chat-link">
+              Book here
+            </a>
+          );
+        }
+
+        if (part === "%%ONEPA_GENERIC%%") {
+          return (
+            <a key={index} href="https://www.onepa.gov.sg/facilities" target="_blank" rel="noopener noreferrer" className="chat-link">
+              OnePA Facilities
+            </a>
+          );
+        }
+
+        return part.split(urlRegex).map((chunk, i) => {
+          if (!chunk) return null;
+          const isUrl = chunk.match(urlRegex);
+          if (!isUrl) return chunk;
+          const href = chunk.startsWith("http://") || chunk.startsWith("https://")
+            ? chunk
+            : `https://${chunk}`;
+          return (
+            <a key={`${index}-${i}`} href={href} target="_blank" rel="noopener noreferrer" className="chat-link">
+              {chunk}
+            </a>
+          );
+        });
       })}
-      {lineIndex < text.split("\n").length - 1 && <br />}
+      {lineIndex < processedText.split("\n").length - 1 && <br />}
     </span>
   ));
 }
@@ -156,9 +207,7 @@ export default function ChatArea({
           return (
             <div
               key={index}
-              className={`message-wrapper ${
-                isUser ? "user-message" : "ai-message"
-              }`}
+              className={`message-wrapper ${isUser ? "user-message" : "ai-message"}`}
             >
               {!isUser && (
                 <div className="avatar ai-avatar">
@@ -167,9 +216,7 @@ export default function ChatArea({
               )}
 
               <div
-                className={`bubble ${
-                  isUser ? "user-bubble" : "ai-bubble"
-                }`}
+                className={`bubble ${isUser ? "user-bubble" : "ai-bubble"}`}
               >
                 {msg.attachment && (
                   <FileCard attachment={msg.attachment} />
