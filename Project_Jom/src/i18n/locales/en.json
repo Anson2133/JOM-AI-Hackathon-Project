@@ -50,7 +50,9 @@
     "help": "Help",
     "newChat": "New Chat",
     "recentConversations": "Recent Conversations",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "announcements": "Announcements",
+    "booking": "Booking"
   },
   "home": {
     "proudlyServing": "Proudly serving Tampines residents",

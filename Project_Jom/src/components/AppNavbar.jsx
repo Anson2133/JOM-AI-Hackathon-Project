@@ -22,11 +22,11 @@ function AppNavbar() {
 
   const initials = profile?.displayName
     ? profile.displayName
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "U";
 
   const currentLanguage = i18n.language?.split("-")[0] || "en";
@@ -64,11 +64,19 @@ function AppNavbar() {
 
         <nav className="navbar-links">
           <NavLink to="/services">{t("nav.services")}</NavLink>
+
           <NavLink to="/chat">{t("nav.chat")}</NavLink>
-          <NavLink to="/history">{t("nav.history")}</NavLink>
+
+          <NavLink to="/booking">
+            {t("nav.booking") || "Booking"}
+          </NavLink>
+
+          <NavLink to="/announcements">
+            {t("nav.announcements") || "Announcements"}
+          </NavLink>
+
           <NavLink to="/help">{t("nav.help")}</NavLink>
         </nav>
-
         <div className="navbar-actions">
           <div className="language-wrapper">
             <button
