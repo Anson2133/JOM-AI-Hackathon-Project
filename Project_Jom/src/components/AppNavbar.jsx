@@ -75,6 +75,8 @@ function AppNavbar() {
             {t("nav.announcements") || "Announcements"}
           </NavLink>
 
+          <NavLink to="/directory">{t("nav.directory")}</NavLink>
+
           <NavLink to="/help">{t("nav.help")}</NavLink>
         </nav>
         <div className="navbar-actions">

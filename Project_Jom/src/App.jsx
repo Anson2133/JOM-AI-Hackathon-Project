@@ -10,6 +10,7 @@ import DocumentScannerPage from "./Document Scanner/pages/DocumentScannerPage";
 import MobileDocumentUploadPage from "./Document Scanner/pages/MobileDocumentUploadPage";
 import HelpPage from "./Help/pages/HelpPage";
 import AnnouncementsPage from "./Announcements/pages/AnnouncementsPage";
+import DirectoryPage from "./Help/pages/DirectoryPage";
 function App() {
   return (
     <Routes>
@@ -29,6 +30,7 @@ function App() {
         <Route path="/document-scanner" element={<DocumentScannerPage />} />
         <Route path="/mobile-document-upload/:scanSessionId" element={<MobileDocumentUploadPage />} />
         <Route path="/help" element={<HelpPage />} />
+        <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
 
       </Route>
