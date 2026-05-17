@@ -7,6 +7,11 @@ import useHelpDirectory from "../hooks/useHelpDirectory";
 
 import "../help.css";
 
+// Read the settings from browser memory
+const isSimpleMode = localStorage.getItem('simpleMode') === 'true';
+const showIcons = localStorage.getItem('showIcons') === 'true';
+const isColorCoded = localStorage.getItem('colorCoded') === 'true';
+
 export default function HelpPage() {
     const {
         searchTerm,
@@ -27,8 +32,10 @@ export default function HelpPage() {
         toggleFaq,
         clearSearch,
     } = useHelpDirectory();
+
     return (
-        <main className="help-page">
+        // 1. Inject the simple mode class here
+        <main className={`help-page ${isSimpleMode ? 'simple-mode-active' : ''}`}>
             <HelpHero />
 
             <HelpQuickActions actions={helpQuickActions} />
@@ -61,6 +68,9 @@ export default function HelpPage() {
                 openDirectoryId={openDirectoryId}
                 toggleDirectoryItem={toggleDirectoryItem}
                 clearSearch={clearSearch}
+                // 2. Pass the settings down to the component that actually draws the lists!
+                showIcons={showIcons}
+                isColorCoded={isColorCoded}
             />
 
             <HelpFaq

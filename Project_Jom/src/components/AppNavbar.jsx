@@ -22,11 +22,11 @@ function AppNavbar() {
 
   const initials = profile?.displayName
     ? profile.displayName
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "U";
 
   const currentLanguage = i18n.language?.split("-")[0] || "en";
@@ -67,6 +67,8 @@ function AppNavbar() {
           <NavLink to="/chat">{t("nav.chat")}</NavLink>
           <NavLink to="/history">{t("nav.history")}</NavLink>
           <NavLink to="/help">{t("nav.help")}</NavLink>
+          {/* NEW SETTINGS LINK ADDED HERE */}
+          <NavLink to="/settings">Settings</NavLink>
         </nav>
 
         <div className="navbar-actions">

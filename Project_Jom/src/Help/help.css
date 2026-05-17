@@ -618,33 +618,101 @@
 }
 
 .help-api-state {
-  max-width: 1320px;
-  margin: 0 auto 28px;
-  padding: 18px 22px;
-  border-radius: 18px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1d4ed8;
-  font-weight: 800;
+    max-width: 1320px;
+    margin: 0 auto 28px;
+    padding: 18px 22px;
+    border-radius: 18px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-weight: 800;
 }
 
 .help-api-state.error {
-  background: #fff1f3;
-  border-color: #fecdca;
-  color: #b42318;
+    background: #fff1f3;
+    border-color: #fecdca;
+    color: #b42318;
 }
 
 .help-api-state p {
-  margin: 6px 0 14px;
-  font-weight: 600;
+    margin: 6px 0 14px;
+    font-weight: 600;
 }
 
 .help-api-state button {
-  border: none;
-  background: #c1121f;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 800;
-  cursor: pointer;
+    border: none;
+    background: #c1121f;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* --- ACCESSIBILITY SETTINGS STYLES --- */
+
+/* 1. Simple Mode: Makes everything huge, high contrast, and adds spacing */
+.simple-mode-active .help-directory-section {
+    max-width: 100%;
+}
+
+.simple-mode-active .help-directory-card {
+    border: 3px solid #1f2937;
+    margin-bottom: 24px;
+}
+
+.simple-mode-active .help-directory-main {
+    padding: 30px;
+    background-color: #f9fafb;
+}
+
+.simple-mode-active .help-directory-card h3 {
+    font-size: 1.6rem;
+}
+
+/* 2. Color-Coded Mode: Tints the headers to help with visual memory */
+.color-green .help-directory-main {
+    background-color: #ecfdf5;
+    border-left: 8px solid #10b981;
+}
+
+.color-red .help-directory-main {
+    background-color: #fef2f2;
+    border-left: 8px solid #ef4444;
+}
+
+.color-blue .help-directory-main {
+    background-color: #eff6ff;
+    border-left: 8px solid #3b82f6;
+}
+
+.color-yellow .help-directory-main {
+    background-color: #fffbeb;
+    border-left: 8px solid #f59e0b;
+}
+
+.color-purple .help-directory-main {
+    background-color: #f5f3ff;
+    border-left: 8px solid #8b5cf6;
+}
+
+/* Keep hover states slightly darker for color-coded mode */
+.color-green .help-directory-main:hover {
+    background-color: #d1fae5;
+}
+
+.color-red .help-directory-main:hover {
+    background-color: #fee2e2;
+}
+
+.color-blue .help-directory-main:hover {
+    background-color: #dbeafe;
+}
+
+.color-yellow .help-directory-main:hover {
+    background-color: #fef3c7;
+}
+
+.color-purple .help-directory-main:hover {
+    background-color: #ede9fe;
 }

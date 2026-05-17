@@ -1,0 +1,117 @@
+.settings-container {
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+}
+
+.settings-header {
+    margin-bottom: 40px;
+}
+
+.settings-header h1 {
+    font-size: 2rem;
+    color: #111827;
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+.settings-header p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.settings-section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section h2 {
+    font-size: 1.25rem;
+    color: #ef4444;
+    /* Tampines Red */
+    margin-top: 0;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 12px;
+}
+
+.setting-item {
+    margin-bottom: 24px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.setting-text label {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.setting-text p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Big, chunky toggle buttons for elderly hands */
+.toggle-btn {
+    min-width: 90px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e5e7eb;
+    color: #4b5563;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn.on {
+    background-color: #10b981;
+    /* High visibility Green */
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+.danger-zone {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.reset-btn:hover {
+    background-color: #e5e7eb;
+}

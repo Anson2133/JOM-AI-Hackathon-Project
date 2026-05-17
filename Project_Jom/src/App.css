@@ -2,3 +2,43 @@
   min-height: 100vh;
   width: 100%;
 }
+
+/* --- GLOBAL ACCESSIBILITY SETTINGS --- */
+
+/* 1. Reduce Glare: Soften whites and blacks */
+.theme-reduce-glare {
+  background-color: #fcf9f2 !important;
+  /* Soft cream */
+  color: #333333 !important;
+  /* Soft charcoal */
+}
+
+/* Target specific bright white containers to soften them too */
+.theme-reduce-glare .help-directory-card,
+.theme-reduce-glare .help-search-panel,
+.theme-reduce-glare .settings-section,
+.theme-reduce-glare .accordion-content,
+.theme-reduce-glare .help-quick-card {
+  background-color: #faf7f0 !important;
+  border-color: #e2dfd8 !important;
+}
+
+/* 2. Extra Legible Text: Boost spacing and change font */
+.theme-legible-text * {
+  font-family: Verdana, Tahoma, sans-serif !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.8 !important;
+}
+
+.theme-legible-text h1,
+.theme-legible-text h2,
+.theme-legible-text h3 {
+  letter-spacing: 0.08em !important;
+}
+
+/* 3. Reduce Motion: Nuke all animations */
+.theme-reduce-motion * {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
