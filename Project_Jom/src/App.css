@@ -2,42 +2,75 @@
   min-height: 100vh;
   width: 100%;
 }
-
-/* --- GLOBAL ACCESSIBILITY SETTINGS --- */
-
-/* 1. Reduce Glare: Soften whites and blacks */
-.theme-reduce-glare {
-  background-color: #fcf9f2 !important;
-  /* Soft cream */
-  color: #333333 !important;
-  /* Soft charcoal */
+#root {
+  min-height: 100vh;
+  width: 100%;
 }
 
-/* Target specific bright white containers to soften them too */
-.theme-reduce-glare .help-directory-card,
-.theme-reduce-glare .help-search-panel,
-.theme-reduce-glare .settings-section,
-.theme-reduce-glare .accordion-content,
-.theme-reduce-glare .help-quick-card {
-  background-color: #faf7f0 !important;
-  border-color: #e2dfd8 !important;
+.app-wrapper {
+  min-height: 100vh;
 }
 
-/* 2. Extra Legible Text: Boost spacing and change font */
-.theme-legible-text * {
-  font-family: Verdana, Tahoma, sans-serif !important;
-  letter-spacing: 0.05em !important;
-  line-height: 1.8 !important;
+/* Text size settings */
+.text-large {
+  font-size: 112%;
 }
 
-.theme-legible-text h1,
-.theme-legible-text h2,
-.theme-legible-text h3 {
-  letter-spacing: 0.08em !important;
+.text-extra-large {
+  font-size: 124%;
 }
 
-/* 3. Reduce Motion: Nuke all animations */
-.theme-reduce-motion * {
+/* Simple view: bigger cards and clearer layout */
+.simple-view .help-directory-card,
+.simple-view .help-tutorial-card,
+.simple-view .help-faq-item,
+.simple-view .help-quick-card,
+.simple-view .settings-card,
+.simple-view .service-card,
+.simple-view .recommendation-card {
+  border-width: 2px;
+}
+
+.simple-view .help-directory-main,
+.simple-view .help-tutorial-card,
+.simple-view .help-quick-card,
+.simple-view .settings-card,
+.simple-view .service-card,
+.simple-view .recommendation-card {
+  padding: 30px;
+}
+
+/* High contrast */
+.high-contrast {
+  color: #111827;
+}
+
+.high-contrast .help-page,
+.high-contrast .settings-page {
+  background: #ffffff;
+}
+
+.high-contrast .help-directory-card,
+.high-contrast .help-tutorial-card,
+.high-contrast .help-faq-item,
+.high-contrast .help-quick-card,
+.high-contrast .settings-card,
+.high-contrast .service-card,
+.high-contrast .recommendation-card,
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast button {
+  border-color: #111827;
+}
+
+.high-contrast p {
+  color: #344054;
+}
+
+/* Reduce motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
   animation: none !important;
   transition: none !important;
   scroll-behavior: auto !important;

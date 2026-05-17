@@ -1,133 +1,185 @@
-import React, { useState } from 'react';
-import '../settings.css';
+import { useEffect, useState } from "react";
+import {
+  Eye,
+  LayoutList,
+  MousePointerClick,
+  RotateCcw,
+  Sparkles,
+  TextCursorInput,
+} from "lucide-react";
+
+import SettingCard, {
+  SettingOptionButton,
+  SettingToggle,
+} from "../components/SettingCard";
+
+import "../settings.css";
+
+const DEFAULT_SETTINGS = {
+  textSize: "normal",
+  simpleView: false,
+  highContrast: false,
+  reduceMotion: false,
+};
+
+function readSettings() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("mytampinesDisplaySettings") || "{}"
+    );
+
+    return {
+      ...DEFAULT_SETTINGS,
+      ...saved,
+    };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function saveSettings(nextSettings) {
+  localStorage.setItem(
+    "mytampinesDisplaySettings",
+    JSON.stringify(nextSettings)
+  );
+
+  window.dispatchEvent(new Event("mytampines-settings-changed"));
+}
 
 export default function SettingsPage() {
-    // 1. Existing Layout Settings
-    const [simpleMode, setSimpleMode] = useState(localStorage.getItem('simpleMode') === 'true');
-    const [showIcons, setShowIcons] = useState(localStorage.getItem('showIcons') === 'true');
-    const [colorCoded, setColorCoded] = useState(localStorage.getItem('colorCoded') === 'true');
+  const [settings, setSettings] = useState(readSettings);
 
-    // 2. NEW Physical Accessibility Settings
-    const [reduceGlare, setReduceGlare] = useState(localStorage.getItem('reduceGlare') === 'true');
-    const [reduceMotion, setReduceMotion] = useState(localStorage.getItem('reduceMotion') === 'true');
-    const [legibleText, setLegibleText] = useState(localStorage.getItem('legibleText') === 'true');
+  useEffect(() => {
+    saveSettings(settings);
+  }, [settings]);
 
-    // Universal toggle function
-    const toggleSetting = (settingKey, currentValue, setterFunc) => {
-        const newValue = !currentValue;
-        setterFunc(newValue);
-        localStorage.setItem(settingKey, newValue);
+  const updateSetting = (key, value) => {
+    setSettings((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  };
 
-        // Refreshes the app instantly so the new classes apply
-        window.location.reload();
-    };
+  const resetSettings = () => {
+    setSettings(DEFAULT_SETTINGS);
+  };
 
-    return (
-        <div className="settings-container">
-            <header className="settings-header">
-                <h1>Accessibility Settings</h1>
-                <p>Adjust these display settings to make reading and navigating easier.</p>
-            </header>
-
-            {/* NEW SECTION: Physical Vision & Reading */}
-            <section className="settings-section">
-                <h2>Vision & Reading</h2>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Reduce Screen Glare</label>
-                        <p>Softens bright white backgrounds to reduce eye strain.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${reduceGlare ? 'on' : ''}`}
-                        onClick={() => toggleSetting('reduceGlare', reduceGlare, setReduceGlare)}
-                    >
-                        {reduceGlare ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Extra Legible Text</label>
-                        <p>Increases space between letters and lines for easier reading.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${legibleText ? 'on' : ''}`}
-                        onClick={() => toggleSetting('legibleText', legibleText, setLegibleText)}
-                    >
-                        {legibleText ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Reduce Motion</label>
-                        <p>Stops menus from sliding and animating.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${reduceMotion ? 'on' : ''}`}
-                        onClick={() => toggleSetting('reduceMotion', reduceMotion, setReduceMotion)}
-                    >
-                        {reduceMotion ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-            </section>
-
-            {/* EXISTING SECTION: Layout & Directory */}
-            <section className="settings-section">
-                <h2>Directory Layout</h2>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Simple List View</label>
-                        <p>Changes side-by-side cards into one large vertical list.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${simpleMode ? 'on' : ''}`}
-                        onClick={() => toggleSetting('simpleMode', simpleMode, setSimpleMode)}
-                    >
-                        {simpleMode ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Show Visual Icons</label>
-                        <p>Adds large pictures next to category names.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${showIcons ? 'on' : ''}`}
-                        onClick={() => toggleSetting('showIcons', showIcons, setShowIcons)}
-                    >
-                        {showIcons ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-
-                <div className="setting-item toggle-item">
-                    <div className="setting-text">
-                        <label>Color-Coded Categories</label>
-                        <p>Applies background colors to separate different topics.</p>
-                    </div>
-                    <button
-                        className={`toggle-btn ${colorCoded ? 'on' : ''}`}
-                        onClick={() => toggleSetting('colorCoded', colorCoded, setColorCoded)}
-                    >
-                        {colorCoded ? 'ON' : 'OFF'}
-                    </button>
-                </div>
-            </section>
-
-            <section className="settings-section danger-zone">
-                <button
-                    className="reset-btn"
-                    onClick={() => {
-                        localStorage.clear();
-                        window.location.reload();
-                    }}
-                >
-                    Reset All Settings to Normal
-                </button>
-            </section>
+  return (
+    <main className="settings-page">
+      <section className="settings-hero">
+        <div>
+          <span className="settings-eyebrow">Display Settings</span>
+          <h1>Make the app easier to read and use</h1>
+          <p>
+            Adjust text size, page layout, contrast, and motion. These settings
+            are saved on this browser and apply across MyTampines Assistant.
+          </p>
         </div>
-    );
+
+        <div className="settings-hero-card">
+          <Sparkles size={28} />
+          <div>
+            <strong>Recommended for residents</strong>
+            <p>
+              Try Large Text and Simple View if you want clearer cards, bigger
+              buttons, and less visual clutter.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <div className="settings-section-header">
+          <span className="settings-section-kicker">Reading</span>
+          <h2>Text and readability</h2>
+          <p>Choose how large text should appear across the app.</p>
+        </div>
+
+        <SettingCard
+          icon={TextCursorInput}
+          title="Text Size"
+          description="Increase text size for pages, cards, buttons, forms, FAQ answers, and chatbot content."
+        >
+          <div className="settings-option-group">
+            <SettingOptionButton
+              active={settings.textSize === "normal"}
+              onClick={() => updateSetting("textSize", "normal")}
+            >
+              Normal
+            </SettingOptionButton>
+
+            <SettingOptionButton
+              active={settings.textSize === "large"}
+              onClick={() => updateSetting("textSize", "large")}
+            >
+              Large
+            </SettingOptionButton>
+
+            <SettingOptionButton
+              active={settings.textSize === "extraLarge"}
+              onClick={() => updateSetting("textSize", "extraLarge")}
+            >
+              Extra Large
+            </SettingOptionButton>
+          </div>
+        </SettingCard>
+
+        <SettingCard
+          icon={Eye}
+          title="High Contrast"
+          description="Makes text, borders, and buttons clearer while keeping the Tampines red theme."
+        >
+          <SettingToggle
+            checked={settings.highContrast}
+            onChange={(value) => updateSetting("highContrast", value)}
+          />
+        </SettingCard>
+      </section>
+
+      <section className="settings-section">
+        <div className="settings-section-header">
+          <span className="settings-section-kicker">Layout</span>
+          <h2>Simpler display</h2>
+          <p>Make pages feel less crowded and easier to scan.</p>
+        </div>
+
+        <SettingCard
+          icon={LayoutList}
+          title="Simple View"
+          description="Uses bigger cards, clearer spacing, stronger borders, and more obvious actions."
+        >
+          <SettingToggle
+            checked={settings.simpleView}
+            onChange={(value) => updateSetting("simpleView", value)}
+          />
+        </SettingCard>
+      </section>
+
+      <section className="settings-section">
+        <div className="settings-section-header">
+          <span className="settings-section-kicker">Comfort</span>
+          <h2>Motion comfort</h2>
+          <p>Reduce extra movement for a calmer experience.</p>
+        </div>
+
+        <SettingCard
+          icon={MousePointerClick}
+          title="Reduce Motion"
+          description="Turns off extra animations, hover movement, transitions, and scanner-style motion effects."
+        >
+          <SettingToggle
+            checked={settings.reduceMotion}
+            onChange={(value) => updateSetting("reduceMotion", value)}
+          />
+        </SettingCard>
+      </section>
+
+      <section className="settings-reset-section">
+        <button type="button" className="settings-reset-btn" onClick={resetSettings}>
+          <RotateCcw size={18} />
+          Reset display settings
+        </button>
+      </section>
+    </main>
+  );
 }
