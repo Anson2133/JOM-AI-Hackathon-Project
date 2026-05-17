@@ -77,8 +77,6 @@ function AppNavbar() {
           <NavLink to="/directory">{t("nav.directory")}</NavLink>
 
           <NavLink to="/help">{t("nav.help")}</NavLink>
-          {/* NEW SETTINGS LINK ADDED HERE */}
-          <NavLink to="/settings">Settings</NavLink>
         </nav>
 
         <div className="navbar-actions">
