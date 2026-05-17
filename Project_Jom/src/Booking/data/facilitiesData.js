@@ -1,7 +1,5 @@
 const facilitiesData = [
-  // =========================
   // POLYCLINICS
-  // =========================
 
   {
     id: 1,
@@ -49,9 +47,7 @@ const facilitiesData = [
     sport: null
   },
 
-  // =========================
   // SPORTS
-  // =========================
 
   {
     id: 3,
@@ -245,9 +241,7 @@ const facilitiesData = [
     sport: "Soccer"
   },
 
-  // =========================
   // BBQ
-  // =========================
 
   {
     id: 11,
@@ -345,109 +339,103 @@ const facilitiesData = [
     sport: null
   },
 
-// =========================
-// COMMON AREA BOOKINGS
-// =========================
+  //Community Facilities
 
-{
-  id: 15,
-  name: "Void Deck & Link Building Booking",
-  type: "Community",
-  category: "common_area",
-  address: "136 Tampines Street 11, Singapore 521136",
-  lat: 1.3489,
-  lng: 103.9434,
-  description:
-    "Book void decks and link buildings for weddings, funerals, social and religious events.",
-  openingHours:
-    "Mon–Fri: 8am–5pm",
-  requirements:
-    "Funeral wake bookings must be made in person before setup. Some religious events require MP approval.",
-  cost:
-    "Social events: $54.50/day | Funeral wakes: Free | Utilities charged separately",
-  bookingLink:
-    "https://www.life.gov.sg/services-tools/book-facilities",
-  websiteName: "Tampines Town Council",
-  phone: "6781 2222",
-  filter: "Void Deck",
-  sport: null
-},
+  {
+    id: 15,
+    name: "Void Deck & Link Building Booking",
+    type: "Community",
+    category: "common_area",
+    address: "136 Tampines Street 11, Singapore 521136",
+    lat: 1.3489,
+    lng: 103.9434,
+    description:
+      "Book void decks and link buildings for weddings, funerals, social and religious events.",
+    openingHours:
+      "Mon–Fri: 8am–5pm",
+    requirements:
+      "Funeral wake bookings must be made in person before setup. Some religious events require MP approval.",
+    cost:
+      "Social events: $54.50/day | Funeral wakes: Free | Utilities charged separately",
+    bookingLink:
+      "https://www.life.gov.sg/services-tools/book-facilities",
+    websiteName: "Tampines Town Council",
+    phone: "6781 2222",
+    filter: "Community",
+    sport: null
+  },
 
-{
-  id: 16,
-  name: "Open Space & Apron Area Booking",
-  type: "Community",
-  category: "common_area",
-  address: "136 Tampines Street 11, Singapore 521136",
-  lat: 1.3489,
-  lng: 103.9434,
-  description:
-    "Book open spaces, apron areas and turf areas for social or religious functions.",
-  openingHours:
-    "Mon–Fri: 8am–5pm",
-  requirements:
-    "Subject to approval by PM in-charge. Generator required for electricity usage.",
-  cost:
-    "Rental: $21.80/day + $300 deposit",
-  bookingLink:
-    "https://www.life.gov.sg/services-tools/book-facilities",
-  websiteName: "Tampines Town Council",
-  phone: "6781 2222",
-  filter: "Open Space",
-  sport: null
-},
+  {
+    id: 16,
+    name: "Open Space & Apron Area Booking",
+    type: "Community",
+    category: "common_area",
+    address: "136 Tampines Street 11, Singapore 521136",
+    lat: 1.3489,
+    lng: 103.9434,
+    description:
+      "Book open spaces, apron areas and turf areas for social or religious functions.",
+    openingHours:
+      "Mon–Fri: 8am–5pm",
+    requirements:
+      "Subject to approval by PM in-charge. Generator required for electricity usage.",
+    cost:
+      "Rental: $21.80/day + $300 deposit",
+    bookingLink:
+      "https://www.life.gov.sg/services-tools/book-facilities",
+    websiteName: "Tampines Town Council",
+    phone: "6781 2222",
+    filter: "Community",
+    sport: null
+  },
 
-{
-  id: 17,
-  name: "Court Booking for Community Events",
-  type: "Community",
-  category: "common_area",
-  address: "136 Tampines Street 11, Singapore 521136",
-  lat: 1.3489,
-  lng: 103.9434,
-  description:
-    "Book basketball, sepak takraw and badminton courts for community events.",
-  openingHours:
-    "Mon–Fri: 8am–5pm",
-  requirements:
-    "MP approval may be required depending on event type.",
-  cost:
-    "Small courts: $54.50/day | Big courts: $109/day | Deposit required",
-  bookingLink:
-    "https://www.life.gov.sg/services-tools/book-facilities",
-  websiteName: "Tampines Town Council",
-  phone: "6781 2222",
-  filter: "Court Booking",
-  sport: null
-},
+  {
+    id: 17,
+    name: "Court Booking for Community Events",
+    type: "Community",
+    category: "common_area",
+    address: "136 Tampines Street 11, Singapore 521136",
+    lat: 1.3489,
+    lng: 103.9434,
+    description:
+      "Book basketball, sepak takraw and badminton courts for community events.",
+    openingHours:
+      "Mon–Fri: 8am–5pm",
+    requirements:
+      "MP approval may be required depending on event type.",
+    cost:
+      "Small courts: $54.50/day | Big courts: $109/day | Deposit required",
+    bookingLink:
+      "https://www.life.gov.sg/services-tools/book-facilities",
+    websiteName: "Tampines Town Council",
+    phone: "6781 2222",
+    filter: "Community",
+    sport: null
+  },
 
-{
-  id: 18,
-  name: "Mini Fair Event Booking",
-  type: "Community",
-  category: "common_area",
-  address: "136 Tampines Street 11, Singapore 521136",
-  lat: 1.3489,
-  lng: 103.9434,
-  description:
-    "Apply for mini-fair event permits at void decks or open spaces.",
-  openingHours:
-    "Mon–Fri: 8am–5pm",
-  requirements:
-    "Letter from Constituency Office and MP endorsement required. $1000 deposit required.",
-  cost:
-    "Void deck: $54.50/day | Open space: $21.80/day",
-  bookingLink:
-    "https://www.life.gov.sg/services-tools/book-facilities",
-  websiteName: "Tampines Town Council",
-  phone: "6781 2222",
-  filter: "Mini Fair",
-  sport: null
-},
-
-  // =========================
-  // BULKY REMOVAL
-  // =========================
+  {
+    id: 18,
+    name: "Mini Fair Event Booking",
+    type: "Community",
+    category: "common_area",
+    address: "136 Tampines Street 11, Singapore 521136",
+    lat: 1.3489,
+    lng: 103.9434,
+    description:
+      "Apply for mini-fair event permits at void decks or open spaces.",
+    openingHours:
+      "Mon–Fri: 8am–5pm",
+    requirements:
+      "Letter from Constituency Office and MP endorsement required. $1000 deposit required.",
+    cost:
+      "Void deck: $54.50/day | Open space: $21.80/day",
+    bookingLink:
+      "https://www.life.gov.sg/services-tools/book-facilities",
+    websiteName: "Tampines Town Council",
+    phone: "6781 2222",
+    filter: "Community",
+    sport: null
+  },
 
   {
     id: 19,
@@ -473,10 +461,6 @@ const facilitiesData = [
     sport: null
   },
 
-  // =========================
-  // SAFRA
-  // =========================
-
   {
     id: 20,
     name: "SAFRA Tampines Facilities & Function Rooms",
@@ -501,14 +485,12 @@ const facilitiesData = [
     sport: null
   },
 
-  // =========================
   // COURSES
-  // =========================
 
   {
     id: 21,
     name: "Chinese Calligraphy @ Tampines West CC",
-    type: "Classes",
+    type: "Courses",
     category: "course",
     address: "5 Tampines Ave 3, #01-05, Singapore 529705",
     lat: 1.3452,
@@ -525,14 +507,15 @@ const facilitiesData = [
       "https://www.onepa.gov.sg/courses/chinese-calligraphy-c027218364",
     websiteName: "OnePA",
     phone: "6788 1912",
-    filter: "Arts",
+    filter: "Courses",
+    courseType: "Arts",
     sport: null
   },
 
   {
     id: 22,
     name: "PA Kiddies Sports Warrior @ Tampines Changkat CC",
-    type: "Classes",
+    type: "Courses",
     category: "course",
     address: "13 Tampines Street 11, #01-01, Singapore 529453",
     lat: 1.3489,
@@ -549,14 +532,15 @@ const facilitiesData = [
       "https://www.onepa.gov.sg/courses/pa-kiddies-sports-warrior-for-all-kid30-c027218103",
     websiteName: "OnePA",
     phone: "6781 1806",
-    filter: "Kids",
+    filter: "Courses",
+    courseType: "Kids",
     sport: null
   },
 
   {
     id: 23,
     name: "Ballet Classes @ Tampines North CC",
-    type: "Classes",
+    type: "Courses",
     category: "course",
     address: "2 Tampines Street 41, Singapore 529204",
     lat: 1.3531,
@@ -572,8 +556,8 @@ const facilitiesData = [
     bookingLink:
       "https://www.onepa.gov.sg/courses/search?course=ballet&outlet=Tampines+North+CC",
     websiteName: "OnePA",
-    phone: "6783 2900",
-    filter: "Dance",
+    filter: "Courses",
+    courseType: "Dance",
     sport: null
   }
 ];
