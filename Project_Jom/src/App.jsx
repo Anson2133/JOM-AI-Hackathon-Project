@@ -12,6 +12,7 @@ import HelpPage from "./Help/pages/HelpPage";
 import AnnouncementsPage from "./Announcements/pages/AnnouncementsPage";
 import DirectoryPage from "./Help/pages/DirectoryPage";
 import SettingsPage from "./Settings/pages/SettingsPage";
+import BookingPage from "./Booking/pages/BookingPage";
 
 function App() {
   return (
@@ -35,7 +36,7 @@ function App() {
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-
+        <Route path="/booking" element={<BookingPage />} />
       </Route>
 
     </Routes>
